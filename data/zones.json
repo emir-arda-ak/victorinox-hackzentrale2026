@@ -1,0 +1,76 @@
+{
+ "sheet": "Product Match Messunterlage v1",
+ "origin": "rechte Kante der roten Startlinie",
+ "rail": "Unterkante der Schale liegt auf der Messschiene",
+ "zones_mm": [
+  {
+   "from": 0,
+   "to": 45,
+   "label": "<45",
+   "class_mm": null
+  },
+  {
+   "from": 45,
+   "to": 61.5,
+   "label": "58",
+   "class_mm": [
+    58
+   ]
+  },
+  {
+   "from": 61.5,
+   "to": 74.5,
+   "label": "65",
+   "class_mm": [
+    65
+   ]
+  },
+  {
+   "from": 74.5,
+   "to": 87.5,
+   "label": "84",
+   "class_mm": [
+    84
+   ]
+  },
+  {
+   "from": 87.5,
+   "to": 96.5,
+   "label": "91/93",
+   "class_mm": [
+    91,
+    93
+   ]
+  },
+  {
+   "from": 96.5,
+   "to": 105.5,
+   "label": "100",
+   "class_mm": [
+    100
+   ]
+  },
+  {
+   "from": 105.5,
+   "to": 120.5,
+   "label": "111",
+   "class_mm": [
+    111
+   ]
+  },
+  {
+   "from": 120.5,
+   "to": 145,
+   "label": "130",
+   "class_mm": [
+    130
+   ]
+  },
+  {
+   "from": 145,
+   "to": 160,
+   "label": ">145",
+   "class_mm": null
+  }
+ ]
+}

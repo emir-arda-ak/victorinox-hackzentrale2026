@@ -1,0 +1,33 @@
+{
+  "_comment": "Gewichte für lib/agent/score.ts. Alexandra tunt hier, ohne TypeScript anzufassen.",
+  "weights": {
+    "tools": 3.0,
+    "length": 2.0,
+    "category": 2.5,
+    "model_name": 3.0,
+    "visible_sku": 10.0,
+    "crossref": 4.0,
+    "material": 0.5,
+    "color": 0.5
+  },
+  "tool_visibility_weight": { "prominent": 1.0, "normal": 0.6, "hidden": 0.25 },
+  "tool_seen_but_missing_penalty": 1.0,
+  "tool_seen_as_subtool_credit": 0.6,
+  "tool_maybe_factor": 0.4,
+  "tool_unseen_penalty": { "open": 0.35, "partly": 0.15, "closed": 0.0 },
+  "tool_answered_no_penalty": 1.5,
+  "length_alt_zone_score": 0.5,
+  "length_sigma_mm": 10,
+  "length_unknown_candidate_score": 0.0,
+  "confidence": {
+    "margin_scale": 2.5,
+    "high": 0.75,
+    "medium": 0.5
+  },
+  "clarify": {
+    "max_rounds": 2,
+    "ask_below_confidence": 0.75,
+    "top_k": 5
+  },
+  "excluded_categories": ["OTHER"]
+}

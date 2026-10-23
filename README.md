@@ -1,36 +1,61 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Product Match – Victorinox Challenge (ZentralHack 2026)
 
-## Getting Started
+Foto eines Taschenmessers → passendes, aktuelles Victorinox-Modell mit Werkzeugvergleich, Konfidenz und Katalogquelle.
 
-First, run the development server:
+## Setup (lokal)
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+npm install
+cp .env.example .env.local   # OPENAI_API_KEY eintragen
+npm run dev                  # http://localhost:3000
+npx tsx scripts/test-score.ts   # Scoring-Tests ohne API-Key
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Die Kamera am Handy braucht HTTPS → vom Handy immer gegen die Vercel-URL testen.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Deploy (Vercel)
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+1. Repo auf GitHub pushen (öffentlich), auf vercel.com „Add New → Project“, Repo wählen.
+2. Environment Variables: `OPENAI_API_KEY`, `OPENAI_VISION_MODEL` (siehe `.env.example`).
+3. Deploy. Jeder Push auf `main` deployt automatisch.
 
-## Learn More
+## Architektur
 
-To learn more about Next.js, take a look at the following resources:
+```
+Foto ─► /api/match ─► extract.ts (1 Vision-Call, zod Structured Output)
+                     └► pipeline.decide(): Router ─► score.ts (deterministisch) ─► clarify.ts (berechnete Rückfrage)
+                                                                                 └► explain.ts (Begründung aus Daten)
+Antwort/Korrektur ─► /api/score ─► gleiche decide()-Logik, ohne LLM (Millisekunden)
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+| Pfad | Inhalt |
+| --- | --- |
+| `data/catalog.json` | 149 Modelle aus dem Katalog 2026 (Parser: separates Paket) |
+| `data/tools.json` | kanonisches Werkzeugvokabular + Sichtbarkeit |
+| `data/zones.json` | Grössenzonen der Messunterlage |
+| `data/crossref.json` | Konkurrenzprodukte + Cross-Reference-Regeln (Andrin füllt) |
+| `config/scoring.json` | **alle Gewichte und Schwellen** (Alexandra tunt hier) |
+| `lib/agent/*` | schema, prompt, extract, score, clarify, explain, pipeline |
+| `app/page.tsx` | Prototyp-UI (M1), wird durch Hainings Design ersetzt |
+| `public/catalog/*.webp` | Produktbilder, `public/messunterlage.pdf` |
+| `eval/run_eval.py` | Top-1/Top-3 gegen die deployte API |
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+Provider-Wechsel: `AZURE_OPENAI_ENDPOINT` + `AZURE_OPENAI_API_KEY` setzen → gleiche App läuft auf Azure OpenAI.
 
-## Deploy on Vercel
+## Eval (Alexandra)
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+```bash
+pip install pillow
+# Bilder nach eval/testset/, Zeilen in eval/ground_truth.csv
+python eval/run_eval.py --url https://<app>.vercel.app
+```
+Gibt Top-1, Top-3, Latenz und Trefferquote pro Konfidenzstufe aus (für die Kalibrierung in `config/scoring.json`).
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## Offen für M2
+
+- [ ] Feedback 👍/👎 + gelernte Regeln (Redis via Vercel Marketplace) → `score(…, learned)` ist vorbereitet
+- [ ] Korrigierbare Chips (Werkzeuge an/aus → `/api/score`)
+- [ ] Agenten-Schritte streamen
+- [ ] Text-Embeddings als zusätzlicher Score-Bestandteil
+- [ ] LLM-Rerank der Top-10 (nur bei knappen Fällen)
+- [ ] UI nach Hainings Design

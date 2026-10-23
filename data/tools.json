@@ -1,0 +1,226 @@
+{
+ "blade_serrated": {
+  "label": "Klinge mit Wellenschliff",
+  "visibility": "prominent"
+ },
+ "blade_hook": {
+  "label": "Hakenklinge / gebogene Klinge",
+  "visibility": "prominent"
+ },
+ "blade_gutting": {
+  "label": "Waidklinge",
+  "visibility": "prominent"
+ },
+ "blade_cheese": {
+  "label": "Käseklinge",
+  "visibility": "prominent"
+ },
+ "blade_cable": {
+  "label": "Kabelklinge",
+  "visibility": "normal"
+ },
+ "blade_small": {
+  "label": "Kleine Klinge",
+  "visibility": "normal"
+ },
+ "blade_large": {
+  "label": "Grosse Klinge",
+  "visibility": "prominent"
+ },
+ "scissors": {
+  "label": "Schere",
+  "visibility": "prominent"
+ },
+ "saw_wood": {
+  "label": "Holzsäge",
+  "visibility": "prominent"
+ },
+ "saw_metal": {
+  "label": "Metallsäge / Metallfeile",
+  "visibility": "prominent"
+ },
+ "saw_glass": {
+  "label": "Frontscheibensäge",
+  "visibility": "prominent"
+ },
+ "pliers": {
+  "label": "Zange",
+  "visibility": "prominent"
+ },
+ "corkscrew": {
+  "label": "Korkenzieher",
+  "visibility": "prominent"
+ },
+ "corkscrew_coupling": {
+  "label": "Kupplung für Korkenzieher",
+  "visibility": "hidden"
+ },
+ "can_opener": {
+  "label": "Dosenöffner",
+  "visibility": "normal"
+ },
+ "bottle_opener": {
+  "label": "Kapselheber",
+  "visibility": "normal"
+ },
+ "phillips": {
+  "label": "Kreuzschlitz-Schraubendreher",
+  "visibility": "normal"
+ },
+ "ratchet": {
+  "label": "Ratsche",
+  "visibility": "prominent"
+ },
+ "bits": {
+  "label": "Bits / Bit-Halter",
+  "visibility": "normal"
+ },
+ "screwdriver": {
+  "label": "Schraubendreher",
+  "visibility": "normal"
+ },
+ "awl": {
+  "label": "Ahle",
+  "visibility": "normal"
+ },
+ "marlinspike": {
+  "label": "Marlspieker",
+  "visibility": "normal"
+ },
+ "hook": {
+  "label": "Mehrzweckhaken",
+  "visibility": "normal"
+ },
+ "chisel": {
+  "label": "Holzmeissel",
+  "visibility": "normal"
+ },
+ "fish_scaler": {
+  "label": "Fischentschupper",
+  "visibility": "prominent"
+ },
+ "letter_opener": {
+  "label": "Brief-/Paketöffner",
+  "visibility": "normal"
+ },
+ "fork": {
+  "label": "Gabel",
+  "visibility": "prominent"
+ },
+ "peeler": {
+  "label": "Orangenschäler",
+  "visibility": "normal"
+ },
+ "magnifier": {
+  "label": "Lupe",
+  "visibility": "prominent"
+ },
+ "ruler": {
+  "label": "Massstab",
+  "visibility": "normal"
+ },
+ "nail_file": {
+  "label": "Nagelfeile",
+  "visibility": "normal"
+ },
+ "nail_cleaner": {
+  "label": "Nagelreiniger",
+  "visibility": "normal"
+ },
+ "nail_clipper": {
+  "label": "Nagelknipser",
+  "visibility": "prominent"
+ },
+ "wire_stripper": {
+  "label": "Drahtabisolierer",
+  "visibility": "normal"
+ },
+ "wire_cutter": {
+  "label": "Drahtschneider",
+  "visibility": "normal"
+ },
+ "wire_bender": {
+  "label": "Drahtbieger",
+  "visibility": "normal"
+ },
+ "crimper": {
+  "label": "Hülsenpresser",
+  "visibility": "normal"
+ },
+ "scraper": {
+  "label": "Schaber",
+  "visibility": "normal"
+ },
+ "crate_opener": {
+  "label": "Kistenöffner",
+  "visibility": "normal"
+ },
+ "seatbelt_cutter": {
+  "label": "Gurtenschneider",
+  "visibility": "prominent"
+ },
+ "glass_breaker": {
+  "label": "Scheibenzertrümmerer",
+  "visibility": "normal"
+ },
+ "shackle_opener": {
+  "label": "Schäkelöffner",
+  "visibility": "normal"
+ },
+ "hoof_cleaner": {
+  "label": "Hufreiniger",
+  "visibility": "prominent"
+ },
+ "bark_lifter": {
+  "label": "Rindenlöser",
+  "visibility": "normal"
+ },
+ "pen": {
+  "label": "Kugelschreiber",
+  "visibility": "hidden"
+ },
+ "led": {
+  "label": "LED",
+  "visibility": "normal"
+ },
+ "tweezers": {
+  "label": "Pinzette",
+  "visibility": "hidden"
+ },
+ "toothpick": {
+  "label": "Zahnstocher",
+  "visibility": "hidden"
+ },
+ "pin": {
+  "label": "Stecknadel",
+  "visibility": "hidden"
+ },
+ "key_ring": {
+  "label": "Ring",
+  "visibility": "normal"
+ },
+ "clip": {
+  "label": "Trageclip",
+  "visibility": "normal"
+ },
+ "thumb_stud": {
+  "label": "Daumenpin (Einhandöffnung)",
+  "visibility": "normal"
+ },
+ "lanyard_hole": {
+  "label": "Befestigungsöse / Kordel",
+  "visibility": "hidden"
+ },
+ "fire": {
+  "label": "Feuerstahl / Feuerstarter",
+  "visibility": "normal"
+ },
+ "foil_cutter": {
+  "label": "Kapselschneider",
+  "visibility": "normal"
+ },
+ "other": {
+  "label": "Sonstiges",
+  "visibility": "normal"
+ }
+}

@@ -1,0 +1,15 @@
+{
+  "_comment": "Kuratierte Konkurrenzprodukte (Andrin). Specs nur aus Herstellerquellen, mit source_url. preferred_match = Victorinox-Modell-ID (catalog.json id) oder null. tools = kanonische IDs aus data/tools.json.",
+  "entries": [
+    {
+      "brand": "Swiza",
+      "model": "BEISPIEL – bitte ersetzen",
+      "category": "SAK",
+      "length_mm": null,
+      "tools": [],
+      "source_url": null,
+      "preferred_match": null,
+      "rule_note": "Platzhalter, wird ignoriert solange model mit BEISPIEL beginnt"
+    }
+  ]
+}
