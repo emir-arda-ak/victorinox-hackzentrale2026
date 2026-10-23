@@ -10,13 +10,33 @@ import toolsMeta from "@/data/tools.json";
 const TOOL_LABEL = toolsMeta as Record<string, { label: string }>;
 const EMPTY: Answers = { tools_yes: [], tools_no: [], length_zone: null, rounds: 0 };
 
+/** decode via createImageBitmap (respects EXIF rotation), fall back to <img> for formats it can't read */
+async function decode(file: File): Promise<{ src: CanvasImageSource; w: number; h: number }> {
+  try {
+    const bmp = await createImageBitmap(file, { imageOrientation: "from-image" });
+    return { src: bmp, w: bmp.width, h: bmp.height };
+  } catch {
+    const url = URL.createObjectURL(file);
+    try {
+      const img = new Image();
+      img.src = url;
+      await img.decode();
+      return { src: img, w: img.naturalWidth, h: img.naturalHeight };
+    } catch {
+      throw new Error("Dieses Bildformat kann der Browser nicht lesen. Bitte als JPEG/PNG speichern oder direkt fotografieren.");
+    } finally {
+      URL.revokeObjectURL(url);
+    }
+  }
+}
+
 async function resize(file: File, max = 1280): Promise<string> {
-  const bmp = await createImageBitmap(file);
-  const s = Math.min(1, max / Math.max(bmp.width, bmp.height));
+  const { src, w, h } = await decode(file);
+  const s = Math.min(1, max / Math.max(w, h));
   const c = document.createElement("canvas");
-  c.width = Math.round(bmp.width * s);
-  c.height = Math.round(bmp.height * s);
-  c.getContext("2d")!.drawImage(bmp, 0, 0, c.width, c.height);
+  c.width = Math.round(w * s);
+  c.height = Math.round(h * s);
+  c.getContext("2d")!.drawImage(src, 0, 0, c.width, c.height);
   return c.toDataURL("image/jpeg", 0.85);
 }
 
@@ -35,6 +55,8 @@ const STATUS = {
 
 export default function Home() {
   const fileRef = useRef<HTMLInputElement>(null);
+  const galleryRef = useRef<HTMLInputElement>(null);
+  const [drag, setDrag] = useState(false);
   const [photo, setPhoto] = useState<string | null>(null);
   const [busy, setBusy] = useState<string | null>(null);
   const [res, setRes] = useState<(MatchResult & { error?: string }) | null>(null);
@@ -60,6 +82,7 @@ export default function Home() {
     } finally {
       setBusy(null);
       if (fileRef.current) fileRef.current.value = "";
+      if (galleryRef.current) galleryRef.current.value = "";
     }
   }
 
@@ -88,11 +111,25 @@ export default function Home() {
         </p>
       </header>
 
+      {/* two inputs: "capture" forces the camera on phones, the second one opens gallery / file picker */}
       <input ref={fileRef} type="file" accept="image/*" capture="environment" className="hidden" onChange={(e) => onFile(e.target.files?.[0])} />
-      <button onClick={() => fileRef.current?.click()} disabled={!!busy}
-        className="w-full rounded-xl bg-red-700 px-4 py-4 text-lg font-semibold text-white disabled:opacity-50">
-        {busy ?? "Messer fotografieren"}
-      </button>
+      <input ref={galleryRef} type="file" accept="image/*" className="hidden" onChange={(e) => onFile(e.target.files?.[0])} />
+      <div
+        onDragOver={(e) => { e.preventDefault(); setDrag(true); }}
+        onDragLeave={() => setDrag(false)}
+        onDrop={(e) => { e.preventDefault(); setDrag(false); onFile(e.dataTransfer.files?.[0]); }}
+        className={`rounded-2xl ${drag ? "ring-2 ring-red-700 ring-offset-4" : ""}`}
+      >
+        <button onClick={() => fileRef.current?.click()} disabled={!!busy}
+          className="w-full rounded-xl bg-red-700 px-4 py-4 text-lg font-semibold text-white disabled:opacity-50">
+          {busy ?? "Messer fotografieren"}
+        </button>
+        <button onClick={() => galleryRef.current?.click()} disabled={!!busy}
+          className="mt-2 w-full rounded-xl border border-gray-300 px-4 py-3 font-medium text-gray-800 disabled:opacity-50">
+          Bild aus Galerie wählen
+        </button>
+        <p className="mt-2 hidden text-center text-xs text-gray-500 md:block">… oder ein Bild hierher ziehen</p>
+      </div>
       {error && <p className="mt-3 rounded bg-red-50 p-3 text-sm text-red-800">{error}</p>}
 
       {photo && (
