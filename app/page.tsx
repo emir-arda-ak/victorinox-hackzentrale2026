@@ -208,7 +208,7 @@ export default function Home() {
       const next = [...(inReview ? pending : []), ...imgs.map((src, i) => ({ src, q: qs[i] }))];
       setPending(next);
       setPendingAdd(add);
-      setSel(next.length - imgs.length);
+      setSel((add ? photos.length : 0) + next.length - imgs.length);
     } catch (e) {
       setError(e instanceof Error ? e.message : String(e));
     } finally {
@@ -227,6 +227,7 @@ export default function Home() {
     if (!add) reset();
     setPending([]);
     setAgentRun(true);
+    window.scrollTo({ top: 0, behavior: "smooth" });
     setBusy("Fotos werden hochgeladen …");
     try {
       const all = [...prevPhotos, ...imgs];
@@ -336,8 +337,10 @@ export default function Home() {
   const hasKnife = extractions.length > 0 || photos.length > 0;
   const working = !!busy;
   const stage: "start" | "review" | "analyse" | "result" =
-    pending.length > 0 && !working ? "review" : !hasKnife && !working ? "start" : working && !res ? "analyse" : "result";
-  const cur = pending[Math.min(sel, pending.length - 1)];
+    pending.length > 0 && !working ? "review" : !hasKnife && !working ? "start" : working && (!res || agentRun) ? "analyse" : "result";
+  const done = pendingAdd ? photos : [];
+  const shown: { src: string; q?: Quality; analysed: boolean }[] = [...done.map((src) => ({ src, analysed: true })), ...pending.map((p) => ({ ...p, analysed: false }))];
+  const cur = shown[Math.min(sel, shown.length - 1)];
   const doneSteps = steps.filter((s) => s.status !== "run").length;
   const progress = steps.length ? Math.min(0.95, doneSteps / Math.max(steps.length + 2, 8)) : 0.08;
   const best = top[0];
@@ -404,7 +407,7 @@ export default function Home() {
           <p className="vx-eyebrow">Vor der Analyse</p>
           <h1 className="vx-h1 mt-1.5 text-[34px] leading-[36px]">Foto prüfen</h1>
           <p className="mt-2 text-[16px] font-light leading-[23px] text-vx-text">
-            {pending.length > 1 ? `${pending.length} Fotos ausgewählt.` : "1 Foto ausgewählt."} Weitere Ansichten erhöhen die Trefferquote.
+            {pending.length === 1 ? "1 neues Foto" : `${pending.length} neue Fotos`}{done.length ? ` · ${done.length} bereits analysiert` : ""}. Weitere Ansichten erhöhen die Trefferquote.
           </p>
         </Section>
         <Section className="pt-5">
@@ -413,25 +416,29 @@ export default function Home() {
             <img src={cur.src} alt="Ausgewähltes Foto" className="size-full object-cover" />
           </div>
           <div className="mt-3 flex gap-2.5 overflow-x-auto pt-2">
-            {pending.map((p, i) => (
+            {shown.map((p, i) => (
               <div key={i} className="relative flex-none">
                 <button onClick={() => setSel(i)} aria-label={`Foto ${i + 1} anzeigen`}
-                  className={`flex size-[84px] items-center justify-center bg-vx-panel ${i === sel ? "border-2 border-vx-red" : "border border-vx-border"}`}>
+                  className={`relative flex size-[84px] items-center justify-center bg-vx-panel ${i === sel ? "border-2 border-vx-red" : "border border-vx-border"}`}>
                   {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img src={p.src} alt="" className="size-[76px] object-cover" />
+                  <img src={p.src} alt="" className={`size-[76px] object-cover ${p.analysed ? "opacity-60" : ""}`} />
+                  {p.analysed && <span className="absolute inset-x-1 bottom-1 bg-white/90 py-0.5 text-center text-[10px] font-semibold uppercase tracking-[0.06em] text-vx-muted">analysiert</span>}
+                  {!p.analysed && done.length > 0 && <span className="absolute inset-x-1 bottom-1 bg-vx-red py-0.5 text-center text-[10px] font-semibold uppercase tracking-[0.06em] text-white">neu</span>}
                 </button>
-                <button aria-label={`Foto ${i + 1} entfernen`} onClick={() => { setPending(pending.filter((_, k) => k !== i)); setSel(Math.max(0, Math.min(sel, pending.length - 2))); }}
-                  className="absolute -right-1.5 -top-1.5 flex size-[18px] items-center justify-center rounded-full border border-[#464646] bg-white text-[11px] leading-none">✕</button>
+                {!p.analysed && (
+                  <button aria-label={`Foto ${i + 1} entfernen`} onClick={() => { const k = i - done.length; setPending(pending.filter((_, j) => j !== k)); setSel(Math.max(0, Math.min(sel, shown.length - 2))); }}
+                    className="absolute -right-1.5 -top-1.5 flex size-[18px] items-center justify-center rounded-full border border-[#464646] bg-white text-[11px] leading-none">✕</button>
+                )}
               </div>
             ))}
           </div>
         </Section>
-        {(!cur.q.sharp || cur.q.exposure !== "ok") && (
+        {cur.q && (!cur.q.sharp || cur.q.exposure !== "ok") && (
           <Section className="pt-4">
             <div className="flex gap-3 border-l-[3px] border-[#d4a017] bg-[#fdf6e3] p-4">
               <span className="text-[#8a6100]">{Ico.warn}</span>
               <p className="text-[15px] leading-[21px]">
-                <span className="font-semibold">{pending.length > 1 ? `Foto ${sel + 1}: ` : ""}{!cur.q.sharp ? "Wirkt unscharf" : cur.q.exposure === "dark" ? "Ziemlich dunkel" : "Stark überbelichtet"}.</span>{" "}
+                <span className="font-semibold">{shown.length > 1 ? `Foto ${sel + 1}: ` : ""}{!cur.q.sharp ? "Wirkt unscharf" : cur.q.exposure === "dark" ? "Ziemlich dunkel" : "Stark überbelichtet"}.</span>{" "}
                 Ein schärferes, gut beleuchtetes Foto erhöht die Trefferquote – Sie können aber trotzdem analysieren.
               </p>
             </div>
@@ -468,8 +475,19 @@ export default function Home() {
       {stage !== "start" && (<>
         {agentRun && (
           <Section className="pt-5" >
-            <p className="vx-eyebrow">Agent arbeitet</p>
-            <h2 className="vx-h1 mt-1 text-[28px] leading-[30px]" aria-live="polite">{busy}</h2>
+            {(() => {
+              const active = [...steps].reverse().find((x) => x.status === "run")?.agent ?? "Vision-Agent";
+              const meta = AGENTS.find((a) => a.name === active);
+              return (
+                <div className="flex items-center gap-4">
+                  <KnifeAvatar agent={active} state="run" size={52} />
+                  <div className="min-w-0">
+                    <p className="vx-eyebrow">{meta?.short ?? "Agent"} arbeitet</p>
+                    <h2 className="vx-h1 mt-1 text-[26px] leading-[28px]" aria-live="polite">{busy}</h2>
+                  </div>
+                </div>
+              );
+            })()}
             {steps.length
               ? <div className="mt-3 h-1 w-full bg-[#ececec]"><div className="h-1 bg-vx-red transition-all duration-500" style={{ width: `${progress * 100}%` }} /></div>
               : <div className="vx-indet relative mt-3 h-1 w-full" />}
@@ -529,12 +547,12 @@ export default function Home() {
         {error && <Section><p className="border-l-[3px] border-vx-red bg-vx-panel p-3 text-[15px]">{error}</p></Section>}
       </>)}
 
-      {res?.status === "rejected" && (
+      {res?.status === "rejected" && !agentRun && (
         <Section><p className="border-l-[3px] border-vx-red bg-vx-panel p-4">Auf dem Foto ist kein Taschenmesser erkennbar. Bitte nochmals fotografieren.</p></Section>
       )}
 
       {/* ---------- recognised (correctable) ---------- */}
-      {ex && res?.status !== "rejected" && (
+      {ex && res?.status !== "rejected" && !agentRun && (
         <Section>
           <p className="vx-section">Erkannt</p>
           <div className="mt-3 flex items-center gap-3.5 bg-vx-panel p-3.5">
@@ -629,7 +647,7 @@ export default function Home() {
       )}
 
       {/* ---------- result ---------- */}
-      {best && res?.ranking && (<>
+      {best && res?.ranking && !agentRun && (<>
         <Section className="pt-5">
           <p className="flex items-center justify-center gap-2 font-cond text-[15px] font-semibold uppercase tracking-[0.1em] text-vx-red">
             {Ico.arrowDown} {isVic ? "Passendes Victorinox-Modell" : "Bester Victorinox-Ersatz"}
@@ -766,7 +784,7 @@ export default function Home() {
         </Section>
       </>)}
 
-      {res && (
+      {res && !agentRun && (
         <Section>
           <Accordion title="Agent-Details & Quellen">
             <p className="text-[12px] text-vx-muted">{res.model ?? "?"} · Prompt {res.prompt_version ?? "?"} · {JSON.stringify(res.timings)}</p>
