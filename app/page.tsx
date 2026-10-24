@@ -621,8 +621,8 @@ export default function Home() {
 
       {res && (
         <Section>
-          <details className="border-y border-vx-line">
-            <summary className="flex cursor-pointer list-none items-center gap-3.5 py-3"><span>{Ico.code}</span><span className="flex-1 text-[16px] font-semibold">Agent-Details & Quellen</span>{Ico.chevron}</summary>
+          <details className="group border-y border-vx-line">
+            <summary className="flex cursor-pointer list-none items-center gap-3.5 py-3"><span>{Ico.code}</span><span className="flex-1 text-[16px] font-semibold">Agent-Details & Quellen</span><span className="rotate-90 transition group-open:-rotate-90">{Ico.chevron}</span></summary>
             <p className="text-[12px] text-vx-muted">{res.model ?? "?"} · Prompt {res.prompt_version ?? "?"} · {JSON.stringify(res.timings)}</p>
             <pre className="mt-2 overflow-x-auto bg-vx-ink p-3 text-[11px] text-white">{JSON.stringify({ answers, extraction: res.extraction, ranking: res.ranking?.candidates.slice(0, 5).map((c) => ({ id: c.id, score: c.score, parts: c.parts })) }, null, 1)}</pre>
           </details>
