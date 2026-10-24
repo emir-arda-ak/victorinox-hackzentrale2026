@@ -1,6 +1,6 @@
 folder,expected_ids,brand,path,notes
 Victorinox Camper,1.3613,Victorinox,victorinox,eigenes Modell (Ordner umbenannt von M)
-Victorinox Classic SD (58mm),0.6223;0.6223.840,Victorinox,victorinox,"eigenes Modell, rot Cellidor"
+Victorinox Classic SD (58mm),0.6223;0.6223.840,Victorinox,victorinox,"geprüft: Classic SD; Etikett auf dem Testmesser sagt 0.6163 (falsch), richtig wäre 0.6223.3G -> für ehrliche Zahl mit --no-sku auswerten"
 Victorinox Outrider,0.8513,Victorinox,victorinox,eigenes Modell
 Victorinox Ranger 57 M Grip,0.9583.MC,Victorinox,victorinox,"geprüft: Ranger 57 M Grip (Waidklinge + Säge), Ordner und Dateien umbenannt"
 Victorinox SwissTool,3.0235.L,Victorinox,victorinox,laut Etikett 3.0235.L = Swiss Tool Spirit X Plus (Schere + Korkenzieher)
