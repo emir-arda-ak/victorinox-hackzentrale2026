@@ -183,6 +183,7 @@ export default function Home() {
   const [sel, setSel] = useState(0);
   const [agentRun, setAgentRun] = useState(false); // an agent request is in flight (upload + stream)
   const [fbSending, setFbSending] = useState(false);
+  const [viewId, setViewId] = useState<string | null>(null); // alternative shown in the comparison card
 
   function reset() {
     setPhotos([]); setExtractions([]); setRes(null); setAnswers(EMPTY); setError(null); setFb("idle"); setFbMsg(null); setAddTool(false); setSteps([]);
@@ -266,6 +267,7 @@ export default function Home() {
             setExtractions(exs);
             setAnswers(ev.result.answers);
             setRes(ev.result);
+            setViewId(null);
             setFb("idle"); setFbMsg(null);
           }
         }
@@ -345,6 +347,13 @@ export default function Home() {
   const doneSteps = steps.filter((s) => s.status !== "run").length;
   const progress = steps.length ? Math.min(0.95, doneSteps / Math.max(steps.length + 2, 8)) : 0.08;
   const best = top[0];
+  const view = (viewId && top.find((c) => c.id === viewId)) || best;
+  const isAlt = !!best && !!view && view.id !== best.id;
+  const others = top.slice(0, 3).filter((c) => c.id !== view?.id);
+  function showCandidate(id: string) {
+    setViewId(id === best?.id ? null : id);
+    document.getElementById("vergleich")?.scrollIntoView({ behavior: "smooth", block: "start" });
+  }
   const pct = (x: number | null | undefined) => (x == null ? "–" : `${Math.round(x * 100)} %`);
 
   return (
@@ -680,18 +689,18 @@ export default function Home() {
       )}
 
       {/* ---------- result ---------- */}
-      {best && res?.ranking && !agentRun && (<>
+      {best && view && res?.ranking && !agentRun && (<>
         <Section className="pt-5">
           <p className="flex items-center justify-center gap-2 font-cond text-[15px] font-semibold uppercase tracking-[0.1em] text-vx-red">
             {Ico.arrowDown} {isVic ? "Passendes Victorinox-Modell" : "Bester Victorinox-Ersatz"}
           </p>
-          <div className="mt-4 border border-vx-border">
+          <div id="vergleich" className="mt-4 scroll-mt-20 border border-vx-border">
             <div className="relative flex h-[260px] items-center justify-center bg-vx-stage">
               {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={best.image} alt={best.name} className="max-h-[230px] max-w-[85%] object-contain" />
-              {best.functional?.coverage != null && (
+              <img src={view.image} alt={view.name} className="max-h-[230px] max-w-[85%] object-contain" />
+              {view.functional?.coverage != null && (
                 <span className="absolute left-3 top-3 bg-vx-ink px-[9px] py-[5px] font-cond text-[13px] font-semibold uppercase tracking-[0.1em] text-white">
-                  {pct(best.functional.coverage)} Funktionen abgedeckt
+                  {pct(view.functional.coverage)} Funktionen abgedeckt
                 </span>
               )}
               <span className="absolute right-3 top-3 flex items-center gap-1.5 bg-white px-[9px] py-[5px] text-[13px] font-semibold">
@@ -699,23 +708,30 @@ export default function Home() {
               </span>
             </div>
             <div className="px-[18px] pb-5 pt-[18px]">
-              <p className="vx-eyebrow">Victorinox · Empfehlung</p>
-              <h2 className="vx-h1 mt-1.5 text-[34px] leading-[34px]">{best.name}</h2>
-              <p className="mt-1.5 text-[15px] text-vx-muted">Art.-Nr. <span className="font-semibold text-vx-ink">{best.id}</span>{best.length_mm ? ` · ${best.length_mm} mm` : ""}</p>
+              <p className="vx-eyebrow">{isAlt ? "Victorinox · Alternative" : "Victorinox · Empfehlung"}</p>
+              <h2 className="vx-h1 mt-1.5 text-[34px] leading-[34px]">{view.name}</h2>
+              <p className="mt-1.5 text-[15px] text-vx-muted">Art.-Nr. <span className="font-semibold text-vx-ink">{view.id}</span>{view.length_mm ? ` · ${view.length_mm} mm` : ""}</p>
+              {isAlt ? (
+                <div className="mt-4 flex items-center justify-between gap-3 bg-vx-panel px-3 py-2.5 text-[14px]">
+                  <span className="text-vx-text">Sie sehen eine Alternative. Empfehlung des Agenten: <span className="font-semibold">{best.name}</span></span>
+                  <button onClick={() => showCandidate(best.id)} className="flex-none font-semibold text-vx-red underline underline-offset-2">Zurück</button>
+                </div>
+              ) : (<>
               <div className="mt-4 flex justify-between text-[14px]">
                 <span className="text-vx-muted">Zuverlässigkeit</span>
                 <span className="font-semibold">{LEVEL[res.ranking.level].text} · {Math.round(res.ranking.confidence * 100)}/100</span>
               </div>
               <div className="mt-1.5 h-1.5 w-full bg-[#ececec]"><div className="h-1.5 bg-vx-red" style={{ width: `${res.ranking.confidence * 100}%` }} /></div>
               <p className="mt-2 text-[13px] text-vx-muted">Heuristischer Wert, keine kalibrierte Wahrscheinlichkeit. {res.ranking.reasons.join(" · ")}</p>
+              </>)}
             </div>
           </div>
         </Section>
 
         <Section>
-          <p className="vx-section">Warum dieses Produkt?</p>
+          <p className="vx-section">{isAlt ? "Diese Alternative im Vergleich" : "Warum dieses Produkt?"}</p>
           <ul className="mt-3 space-y-1">
-            {best.explanation.map((e) => (
+            {view.explanation.map((e) => (
               <li key={e} className="flex gap-2.5 py-1.5 text-[16px] leading-[22.4px]"><span className="mt-0.5 flex-none text-vx-red">{Ico.check}</span>{e}</li>
             ))}
           </ul>
@@ -725,10 +741,10 @@ export default function Home() {
           <p className="vx-section">Technischer Vergleich</p>
           <div className="mt-3 grid grid-cols-2 border-l border-t border-vx-border">
             {[
-              ["Länge", best.length_mm ? `${best.length_mm} mm` : "–"],
-              ["Kategorie", CATEGORIES[best.category] ?? best.category],
-              ["Werkzeuge (Katalog)", String(best.tools.filter((t) => t.status !== "missing").length)],
-              ["Gemeinsam mit Foto", String(best.tools.filter((t) => t.status === "both").length)],
+              ["Länge", view.length_mm ? `${view.length_mm} mm` : "–"],
+              ["Kategorie", CATEGORIES[view.category] ?? view.category],
+              ["Werkzeuge (Katalog)", String(view.tools.filter((t) => t.status !== "missing").length)],
+              ["Gemeinsam mit Foto", String(view.tools.filter((t) => t.status === "both").length)],
             ].map(([k, v]) => (
               <div key={k} className="border-b border-r border-vx-border px-3.5 py-3">
                 <p className="text-[13px] text-vx-muted">{k}</p>
@@ -739,7 +755,7 @@ export default function Home() {
           <table className="mt-4 w-full text-[15px]">
             <thead><tr className="text-left text-[13px] text-vx-muted"><th className="pb-1 font-normal">Werkzeug</th><th className="pb-1 text-center font-normal">Foto</th><th className="pb-1 text-center font-normal">Victorinox</th></tr></thead>
             <tbody>
-              {best.tools.map((t) => (
+              {view.tools.map((t) => (
                 <tr key={t.tool} className="border-t border-vx-line">
                   <td className="py-1.5">{t.label}</td>
                   <td className="text-center">{t.status === "both" || t.status === "missing" ? "✓" : t.status === "unknown" ? "?" : "–"}</td>
@@ -748,15 +764,17 @@ export default function Home() {
               ))}
             </tbody>
           </table>
-          <p className="mt-2.5 text-[13px] italic text-vx-muted">Quelle: {best.source.doc}, S. {best.source.page_printed} · ? = auf dem Foto nicht sichtbar</p>
+          <p className="mt-2.5 text-[13px] italic text-vx-muted">Quelle: {view.source.doc}, S. {view.source.page_printed} · ? = auf dem Foto nicht sichtbar</p>
         </Section>
 
-        {top.length > 1 && (
+        {others.length > 0 && (
           <Section>
             <p className="vx-section">Weitere Kandidaten</p>
+            <p className="mt-1 text-[14px] text-vx-muted">Antippen zeigt das Produkt im Vergleich oben.</p>
             <div className="mt-3 grid grid-cols-2 gap-3">
-              {top.slice(1, 3).map((c) => (
-                <div key={c.id} className="border border-vx-border pb-3">
+              {others.map((c) => (
+                <button key={c.id} onClick={() => showCandidate(c.id)} aria-label={`${c.name} im Vergleich anzeigen`}
+                  className="border border-vx-border pb-3 text-left transition-colors hover:border-vx-ink focus-visible:outline-2 focus-visible:outline-vx-red">
                   <div className="flex h-[120px] items-center justify-center bg-vx-stage">
                     {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img src={c.image} alt={c.name} className="max-h-[104px] max-w-[90%] object-contain" />
@@ -764,7 +782,8 @@ export default function Home() {
                   <p className="vx-h1 px-3 pt-2.5 text-[19px] leading-[22px]">{c.name}</p>
                   <p className="px-3 pt-0.5 text-[14px] text-vx-muted">{c.id} · {c.length_mm ?? "–"} mm</p>
                   {c.functional?.coverage != null && <p className="px-3 pt-1.5 text-[13px] font-semibold">{pct(c.functional.coverage)} Funktionen</p>}
-                </div>
+                  <p className="px-3 pt-1.5 text-[13px] font-semibold text-vx-red">{c.id === best.id ? "Empfehlung anzeigen" : "Vergleichen"} ›</p>
+                </button>
               ))}
             </div>
           </Section>
@@ -773,12 +792,12 @@ export default function Home() {
         <Section>
           <div className="bg-vx-panel p-[18px]">
             {fb !== "done" && (<>
-              <p className="vx-h1 text-[20px]">Ist die Empfehlung korrekt?</p>
+              <p className="vx-h1 text-[20px]">{isAlt ? `Passt ${view.name} besser?` : "Ist die Empfehlung korrekt?"}</p>
               <p className="mt-0.5 text-[14px] text-vx-muted">Ihr Feedback verbessert den Agenten laufend.</p>
             </>)}
             {fb === "idle" && (
               <div className="mt-3.5 grid grid-cols-[1fr_1.3fr] gap-2.5">
-                <button disabled={fbSending} className="vx-btn vx-btn-outline h-[46px] gap-2 px-3 text-[16px]" onClick={() => sendFeedback(best.id, true)}>{fbSending ? <span className="vx-spinner" /> : Ico.thumbUp} Korrekt</button>
+                <button disabled={fbSending} className="vx-btn vx-btn-outline h-[46px] gap-2 px-3 text-[16px]" onClick={() => sendFeedback(view.id, !isAlt)}>{fbSending ? <span className="vx-spinner" /> : Ico.thumbUp} {isAlt ? "Diese passt" : "Korrekt"}</button>
                 <button disabled={fbSending} className="vx-btn vx-btn-outline h-[46px] gap-2 px-3 text-[16px]" onClick={() => setFb("pick")}>{Ico.thumbDown} Nicht korrekt</button>
               </div>
             )}
