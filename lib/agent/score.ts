@@ -73,8 +73,11 @@ function toolScore(c: CatalogModel, ex: Extraction, ans: Answers) {
 function lengthScore(c: CatalogModel, ex: Extraction, ans: Answers): { s: number; conf: number } {
   const zoneLabel = ans.length_zone ?? ex.length_zone;
   const zoneConf = ans.length_zone ? 1 : ex.length_zone_confidence;
-  const zone = zoneFor(zoneLabel);
   const mm = ans.length_zone ? null : ex.length_estimate_mm;
+  // the model sometimes names a zone that contradicts its own ruler reading -> trust the mm reading then
+  const llmZone = zoneFor(zoneLabel);
+  const zoneContradicts = !ans.length_zone && !!mm && !!llmZone && (mm < llmZone.from - 6 || mm > llmZone.to + 6);
+  const zone = zoneContradicts ? undefined : llmZone;
   const measured = !!zone?.class_mm || !!mm;
   if (c.length_mm == null) {
     // catalog has no length (multitools, one-hand knives, cards): neutral, but a measured SAK should not drift to them
