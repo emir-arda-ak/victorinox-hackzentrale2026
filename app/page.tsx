@@ -82,17 +82,13 @@ const AGENTS = [
 ] as const;
 const ICON = Object.fromEntries(AGENTS.map((a) => [a.name, a.icon])) as Record<string, string>;
 
-function KnifeAvatar({ agent, state, size = 36 }: { agent: string; state: "run" | "done" | "skip" | "idle"; size?: number }) {
+function KnifeAvatar({ agent, state, size = 30 }: { agent: string; state: "run" | "done" | "skip" | "idle"; size?: number }) {
   const url = `url(${ICON[agent] ?? AGENTS[0].icon})`;
-  const color = state === "run" ? "bg-vx-red" : state === "skip" ? "bg-amber-500" : state === "done" ? "bg-vx-ink" : "bg-[#c8c8c8]";
+  const color = state === "run" ? "bg-vx-red" : state === "skip" ? "bg-[#8a6100]" : state === "done" ? "bg-vx-ink" : "bg-[#cfcfcf]";
+  // square box, mask centred -> rotation happens around the knife's own centre; the only animation is the spin while working
   return (
-    <span className={`relative inline-flex flex-none items-center justify-center rounded-full border bg-white ${state === "run" ? "border-vx-red" : "border-vx-border"}`}
-      style={{ width: size, height: size }} aria-hidden>
-      <span className={`block ${color} ${state === "run" ? "animate-[spin_1.4s_linear_infinite]" : ""}`}
-        style={{ width: size * 0.78, height: size * 0.78, WebkitMask: `${url} center / contain no-repeat`, mask: `${url} center / contain no-repeat` }} />
-      {state === "done" && size >= 40 && <span className="absolute -bottom-0.5 -right-0.5 flex size-[15px] items-center justify-center rounded-full bg-vx-ink text-[9px] text-white">✓</span>}
-      {state === "skip" && size >= 40 && <span className="absolute -bottom-0.5 -right-0.5 flex size-[15px] items-center justify-center rounded-full bg-amber-500 text-[9px] text-white">!</span>}
-    </span>
+    <span aria-hidden className={`block flex-none ${color} ${state === "run" ? "animate-[spin_1.6s_linear_infinite]" : ""}`}
+      style={{ width: size, height: size, transformOrigin: "50% 50%", WebkitMask: `${url} center / contain no-repeat`, mask: `${url} center / contain no-repeat` }} />
   );
 }
 
@@ -352,30 +348,37 @@ export default function Home() {
                 <span className="vx-section">Agent-Schritte · {steps.length}{res?.agent_checks?.length ? ` · ${res.agent_checks.length} Selbstprüfung${res.agent_checks.length > 1 ? "en" : ""}` : ""}</span>
                 <span className="rotate-90 transition group-open:-rotate-90">{Ico.chevron}</span>
               </summary>
-              <div className="mt-4 grid grid-cols-4 gap-1 text-center">
+              <ul className="mt-1">
                 {AGENTS.map((a) => {
                   const mine = steps.filter((s) => s.agent === a.name);
-                  const state = mine.some((s) => s.status === "run") ? "run" : mine.length ? "done" : "idle";
+                  const last = mine[mine.length - 1];
+                  const state = mine.some((s) => s.status === "run") ? "run" : last?.status === "skip" ? "skip" : mine.length ? "done" : "idle";
                   return (
-                    <div key={a.name} className="flex flex-col items-center gap-1">
-                      <KnifeAvatar agent={a.name} state={state} size={48} />
-                      <span className={`font-cond text-[13px] font-semibold uppercase leading-tight tracking-[0.04em] ${state === "run" ? "text-vx-red" : state === "idle" ? "text-[#b5b5b5]" : "text-vx-ink"}`}>{a.short}</span>
-                      <span className="text-[11px] leading-tight text-vx-muted">{a.role}</span>
-                    </div>
+                    <li key={a.name} className="flex items-start gap-4 border-b border-vx-line py-3.5 last:border-b-0">
+                      <KnifeAvatar agent={a.name} state={state} size={30} />
+                      <div className="min-w-0 flex-1">
+                        <div className="flex items-baseline justify-between gap-3">
+                          <span className={`font-cond text-[17px] font-semibold uppercase tracking-[0.06em] ${state === "idle" ? "text-[#b5b5b5]" : "text-vx-ink"}`}>{a.short}</span>
+                          <span className={`text-[13px] ${state === "run" ? "text-vx-red" : state === "skip" ? "text-[#8a6100]" : "text-vx-muted"}`}>
+                            {state === "run" ? "arbeitet …" : state === "skip" ? "unklar" : state === "done" ? `${mine.length} Schritt${mine.length > 1 ? "e" : ""}` : a.role}
+                          </span>
+                        </div>
+                        {last && <p className="mt-0.5 text-[14px] leading-[19px] text-vx-muted">{last.text}</p>}
+                      </div>
+                    </li>
                   );
                 })}
-              </div>
-              <ol className="mt-4 space-y-3">
-                {steps.map((s) => (
-                  <li key={s.id} className="flex items-start gap-3">
-                    <KnifeAvatar agent={s.agent} state={s.status} size={26} />
-                    <span className="text-[15px] leading-[20px]">
-                      <span className="font-semibold">{s.agent}</span>
-                      <span className="block text-[13px] leading-[18px] text-vx-muted">{s.text}{s.ms != null && ` · ${(s.ms / 1000).toFixed(1)} s`}</span>
-                    </span>
-                  </li>
-                ))}
-              </ol>
+              </ul>
+              <details className="group/log mt-1">
+                <summary className="cursor-pointer list-none py-2 text-[14px] text-vx-muted underline underline-offset-2">Protokoll anzeigen ({steps.length} Schritte)</summary>
+                <ol className="mt-1 space-y-2 border-l border-vx-line pl-4">
+                  {steps.map((s) => (
+                    <li key={s.id} className="text-[13px] leading-[18px] text-vx-muted">
+                      <span className="font-semibold text-vx-ink">{s.agent}</span> · {s.text}{s.ms != null && ` · ${(s.ms / 1000).toFixed(1)} s`}
+                    </li>
+                  ))}
+                </ol>
+              </details>
             </details>
           </Section>
         )}
