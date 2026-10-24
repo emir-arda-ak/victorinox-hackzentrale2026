@@ -336,8 +336,9 @@ export default function Home() {
   const isVic = ex?.is_victorinox;
   const hasKnife = extractions.length > 0 || photos.length > 0;
   const working = !!busy;
-  const stage: "start" | "review" | "analyse" | "result" =
-    pending.length > 0 && !working ? "review" : !hasKnife && !working ? "start" : working && (!res || agentRun) ? "analyse" : "result";
+  const asking = !!question && res?.status === "ok" && !agentRun && pending.length === 0;
+  const stage: "start" | "review" | "analyse" | "question" | "result" =
+    pending.length > 0 && !working ? "review" : !hasKnife && !working ? "start" : working && (!res || agentRun) ? "analyse" : asking ? "question" : "result";
   const done = pendingAdd ? photos : [];
   const shown: { src: string; q?: Quality; analysed: boolean }[] = [...done.map((src) => ({ src, analysed: true })), ...pending.map((p) => ({ ...p, analysed: false }))];
   const cur = shown[Math.min(sel, shown.length - 1)];
@@ -357,7 +358,7 @@ export default function Home() {
         <img src="/brand/victorinox-logo.png" alt="Victorinox" width={148} height={30} className="h-[30px] w-auto" />
         {stage !== "start" && (
           <div className="flex items-center gap-3">
-            <span className="font-cond text-[18px] font-semibold uppercase tracking-[0.06em]">{stage === "review" ? "" : stage === "analyse" ? "Analyse" : "Ergebnis"}</span>
+            <span className="font-cond text-[18px] font-semibold uppercase tracking-[0.06em]">{stage === "review" ? "" : stage === "analyse" ? "Analyse" : stage === "question" ? "Rückfrage" : "Ergebnis"}</span>
             <button onClick={() => (stage === "review" ? setPending([]) : reset())} disabled={working} aria-label={stage === "review" ? "Abbrechen" : "Neues Messer"} className="flex size-10 items-center justify-center disabled:opacity-40">{Ico.close}</button>
           </div>
         )}
@@ -470,7 +471,77 @@ export default function Home() {
         {error && <Section><p className="border-l-[3px] border-vx-red bg-vx-panel p-3 text-[15px]">{error}</p></Section>}
       </>)}
 
-      {stage !== "review" && (<>
+      {/* ---------- Rückfrage: interstitial before the result (Figma 06) ---------- */}
+      {stage === "question" && question && (<>
+        <Section>
+          <p className="vx-eyebrow">Eine Angabe fehlt noch</p>
+          <h1 className="vx-h1 mt-1.5 text-[30px] leading-[32px]">{question.type === "photo_open" ? "Wie möchten Sie fortfahren?" : question.text}</h1>
+          <div className="mt-4 flex gap-3 border-l-[3px] border-[#d4a017] bg-[#fdf6e3] p-4">
+            <span className="text-[#8a6100]">{Ico.warn}</span>
+            <div>
+              <p className="text-[16px] font-semibold">Erkennung unsicher{res?.ranking ? ` · Zuverlässigkeit ${Math.round(res.ranking.confidence * 100)}/100` : ""}</p>
+              <p className="text-[15px] leading-[21px] text-vx-text">{question.reason}</p>
+            </div>
+          </div>
+        </Section>
+        <Section className="pt-5">
+          {question.type === "photo_open" && (
+            <div className="flex flex-col gap-3">
+              <button disabled={working} onClick={() => camRef.current?.click()} className="flex w-full items-center gap-3.5 border-2 border-vx-red p-4 text-left disabled:opacity-50">
+                <span className="flex size-10 flex-none items-center justify-center bg-vx-panel text-vx-red">{Ico.camera}</span>
+                <span className="flex-1"><span className="block text-[16px] font-semibold">Neues Foto, Werkzeuge aufgeklappt</span>
+                  <span className="text-[14px] text-vx-muted">Empfohlen – schnellster Weg zu einem sicheren Treffer</span></span>
+                {Ico.chevron}
+              </button>
+              <button disabled={working} onClick={() => rescore({ ...answers, rounds: answers.rounds + 1 })} className="flex w-full items-center gap-3.5 border border-vx-border p-4 text-left disabled:opacity-50">
+                <span className="flex size-10 flex-none items-center justify-center bg-vx-panel text-vx-ink">{Ico.chevron}</span>
+                <span className="flex-1"><span className="block text-[16px] font-semibold">Ohne weiteres Foto fortfahren</span>
+                  <span className="text-[14px] text-vx-muted">Ergebnis mit den vorhandenen Angaben</span></span>
+                {Ico.chevron}
+              </button>
+            </div>
+          )}
+          {question.type === "length" && (
+            <div className="grid border border-vx-ink" style={{ gridTemplateColumns: `repeat(${question.options.length + 1}, minmax(0,1fr))` }}>
+              {question.options.map((o, i) => (
+                <button key={o.zone} disabled={working} className={`h-[50px] font-cond text-[16px] font-semibold uppercase disabled:opacity-50 ${i ? "border-l border-vx-ink" : ""}`}
+                  onClick={() => rescore({ ...answers, length_zone: o.zone as Answers["length_zone"], rounds: answers.rounds + 1 })}>{o.label}</button>
+              ))}
+              <button disabled={working} className="h-[50px] border-l border-vx-ink font-cond text-[16px] font-semibold uppercase disabled:opacity-50" onClick={() => rescore({ ...answers, rounds: answers.rounds + 1 })}>Weiss nicht</button>
+            </div>
+          )}
+          {question.type === "tool" && (
+            <div className="grid grid-cols-3 border border-vx-ink">
+              <button disabled={working} className="h-[50px] font-cond text-[16px] font-semibold uppercase disabled:opacity-50" onClick={() => rescore({ ...answers, tools_yes: [...answers.tools_yes, question.tool], rounds: answers.rounds + 1 })}>Ja</button>
+              <button disabled={working} className="h-[50px] border-l border-vx-ink font-cond text-[16px] font-semibold uppercase disabled:opacity-50" onClick={() => rescore({ ...answers, tools_no: [...answers.tools_no, question.tool], rounds: answers.rounds + 1 })}>Nein</button>
+              <button disabled={working} className="h-[50px] border-l border-vx-ink font-cond text-[16px] font-semibold uppercase disabled:opacity-50" onClick={() => rescore({ ...answers, rounds: answers.rounds + 1 })}>Weiss nicht</button>
+            </div>
+          )}
+          {working && <p className="mt-3 flex items-center gap-2 text-[14px] text-vx-muted"><span className="vx-spinner" /> Wird neu berechnet …</p>}
+        </Section>
+        {top.length > 0 && (
+          <Section>
+            <p className="vx-section">Aktuelle Kandidaten</p>
+            <ul className="mt-3">
+              {top.slice(0, 3).map((c) => (
+                <li key={c.id} className="flex items-center gap-3.5 border-t border-vx-line py-3 last:border-b">
+                  <span className="flex size-[52px] flex-none items-center justify-center bg-vx-stage">
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img src={c.image} alt="" className="max-h-[46px] max-w-[46px] object-contain" />
+                  </span>
+                  <span className="min-w-0 flex-1">
+                    <span className="block text-[16px] font-semibold">{c.name}</span>
+                    <span className="text-[14px] text-vx-muted">{c.id}{c.length_mm ? ` · ${c.length_mm} mm` : ""}</span>
+                  </span>
+                </li>
+              ))}
+            </ul>
+          </Section>
+        )}
+        {error && <Section><p className="border-l-[3px] border-vx-red bg-vx-panel p-3 text-[15px]">{error}</p></Section>}
+      </>)}
+
+      {stage !== "review" && stage !== "question" && (<>
       {/* ---------- photos + agent ---------- */}
       {stage !== "start" && (<>
         {agentRun && (
@@ -605,44 +676,6 @@ export default function Home() {
             )}
           </Accordion>
           </div>
-        </Section>
-      )}
-
-      {/* ---------- follow-up question (Rückfrage) ---------- */}
-      {question && !working && (
-        <Section>
-          <div className="flex gap-3 border-l-[3px] border-[#d4a017] bg-[#fdf6e3] p-4">
-            <span className="text-[#8a6100]">{Ico.warn}</span>
-            <div>
-              <p className="text-[16px] font-semibold">Erkennung unsicher{res?.ranking ? ` · Zuverlässigkeit ${Math.round(res.ranking.confidence * 100)}/100` : ""}</p>
-              <p className="text-[15px] leading-[21px] text-vx-text">{question.reason}</p>
-            </div>
-          </div>
-          <p className="vx-eyebrow mt-5">Eine Angabe fehlt noch</p>
-          <h2 className="vx-h1 mt-1 text-[26px] leading-[28px]">{question.type === "photo_open" ? "Wie möchten Sie fortfahren?" : question.text}</h2>
-          {question.type === "photo_open" && (
-            <button onClick={() => camRef.current?.click()} className="mt-3 flex w-full items-center gap-3.5 border-2 border-vx-red p-4 text-left">
-              <span className="flex size-10 flex-none items-center justify-center bg-vx-panel text-vx-red">{Ico.camera}</span>
-              <span className="flex-1"><span className="block text-[16px] font-semibold">Neues Foto, Werkzeuge aufgeklappt</span>
-                <span className="text-[14px] text-vx-muted">{question.text}</span></span>
-              {Ico.chevron}
-            </button>
-          )}
-          {question.type === "length" && (
-            <div className="mt-3 grid border border-vx-ink" style={{ gridTemplateColumns: `repeat(${question.options.length}, minmax(0,1fr))` }}>
-              {question.options.map((o, i) => (
-                <button key={o.zone} className={`h-[46px] font-cond text-[16px] font-semibold uppercase ${i ? "border-l border-vx-ink" : ""}`}
-                  onClick={() => rescore({ ...answers, length_zone: o.zone as Answers["length_zone"], rounds: answers.rounds + 1 })}>{o.label}</button>
-              ))}
-            </div>
-          )}
-          {question.type === "tool" && (
-            <div className="mt-3 grid grid-cols-3 border border-vx-ink">
-              <button className="h-[46px] font-cond text-[16px] font-semibold uppercase" onClick={() => rescore({ ...answers, tools_yes: [...answers.tools_yes, question.tool], rounds: answers.rounds + 1 })}>Ja</button>
-              <button className="h-[46px] border-l border-vx-ink font-cond text-[16px] font-semibold uppercase" onClick={() => rescore({ ...answers, tools_no: [...answers.tools_no, question.tool], rounds: answers.rounds + 1 })}>Nein</button>
-              <button className="h-[46px] border-l border-vx-ink font-cond text-[16px] font-semibold uppercase" onClick={() => rescore({ ...answers, rounds: answers.rounds + 1 })}>Weiss nicht</button>
-            </div>
-          )}
         </Section>
       )}
 
