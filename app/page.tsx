@@ -2,10 +2,11 @@
 
 import { useRef, useState } from "react";
 import type { MatchResult } from "@/lib/agent/pipeline";
+import type { AgentEvent, AgentCheck, StepEvent } from "@/lib/agent/orchestrator";
 import type { Answers, Extraction } from "@/lib/agent/schema";
 import toolsMeta from "@/data/tools.json";
 
-/** M2 prototype UI: several photos per knife (merged), correctable chips, follow-up questions, feedback.
+/** M3 prototype UI: several photos at once, live agent steps, correctable chips, follow-up questions, feedback.
  *  Hainings Design ersetzt das Styling später; Logik und Datenfluss bleiben. */
 
 type ToolKey = keyof typeof toolsMeta;
@@ -18,7 +19,8 @@ const CATEGORIES: Record<string, string> = {
 };
 const EMPTY: Answers = { tools_yes: [], tools_no: [], length_zone: null, category: null, rounds: 0 };
 
-type Res = MatchResult & { photos?: number; photo_extraction?: Extraction; model?: string; prompt_version?: string; error?: string };
+type Res = MatchResult & { photos?: number; model?: string; prompt_version?: string; agent_checks?: AgentCheck[]; error?: string };
+const MAX_PHOTOS = 6;
 type CatItem = { id: string; name: string; length_mm: number | null; image: string };
 
 /** decode via createImageBitmap (respects EXIF rotation), fall back to <img> for formats it can't read */
@@ -95,27 +97,70 @@ export default function Home() {
   const [fbMsg, setFbMsg] = useState<string | null>(null);
   const [q, setQ] = useState("");
   const [hits, setHits] = useState<CatItem[]>([]);
+  const [steps, setSteps] = useState<StepEvent[]>([]);
 
   function reset() {
-    setPhotos([]); setExtractions([]); setRes(null); setAnswers(EMPTY); setError(null); setFb("idle"); setFbMsg(null); setAddTool(false);
+    setPhotos([]); setExtractions([]); setRes(null); setAnswers(EMPTY); setError(null); setFb("idle"); setFbMsg(null); setAddTool(false); setSteps([]);
   }
 
-  /** first photo of a new knife, or an additional photo of the same knife (add=true) */
-  async function onFile(f: File | undefined, add: boolean) {
-    if (!f) return;
+  /** one or several photos; added to the current knife (add=true) or starting a new one */
+  async function onFiles(list: FileList | File[] | null | undefined, add: boolean) {
+    const files = [...(list ?? [])].filter((f) => f.type.startsWith("image/") || /\.(heic|heif)$/i.test(f.name));
+    if (!files.length) return;
     setError(null);
+    const prevPhotos = add ? photos : [];
+    const prevEx = add ? extractions : [];
+    const room = MAX_PHOTOS - prevPhotos.length;
+    if (room <= 0) return setError(`Maximal ${MAX_PHOTOS} Fotos pro Messer. Für ein anderes Messer „Neues Messer" wählen.`);
     if (!add) reset();
-    setBusy(add ? "Weiteres Foto wird analysiert …" : "Agent analysiert das Foto …");
+    const use = files.slice(0, room);
+    setBusy(use.length > 1 ? `${use.length} Fotos werden vorbereitet …` : "Foto wird vorbereitet …");
     try {
-      const img = await resize(f);
-      const prev = add ? extractions : [];
-      setPhotos((p) => (add ? [...p, img] : [img]));
-      const j = await postJson<Res>("/api/match", { image: img, previous: prev, answers: add ? answers : EMPTY });
-      setExtractions([...prev, j.photo_extraction!]);
-      setRes(j);
-      setFb("idle"); setFbMsg(null);
+      const imgs = await Promise.all(use.map((f) => resize(f)));
+      const all = [...prevPhotos, ...imgs];
+      setPhotos(all);
+      setSteps([]);
+      setBusy("Agent arbeitet …");
+      const r = await fetch("/api/agent", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ photos: all, previous: prevEx, answers: add ? answers : EMPTY }),
+      });
+      if (!r.ok || !r.body) {
+        const j = await r.json().catch(() => ({}));
+        throw new Error(j.error ?? r.statusText);
+      }
+      const exs: Extraction[] = [...prevEx];
+      const reader = r.body.getReader();
+      const dec = new TextDecoder();
+      let buf = "";
+      for (;;) {
+        const { value, done } = await reader.read();
+        if (value) buf += dec.decode(value, { stream: true });
+        let nl: number;
+        while ((nl = buf.indexOf("\n")) >= 0) {
+          const line = buf.slice(0, nl).trim();
+          buf = buf.slice(nl + 1);
+          if (!line) continue;
+          const ev = JSON.parse(line) as AgentEvent;
+          if (ev.type === "step") {
+            setSteps((st) => { const i = st.findIndex((x) => x.id === ev.id); return i >= 0 ? st.map((x, k) => (k === i ? ev : x)) : [...st, ev]; });
+            if (ev.status === "run") setBusy(ev.text);
+          } else if (ev.type === "photo") exs[ev.index] = ev.extraction;
+          else if (ev.type === "error") throw new Error(ev.error);
+          else if (ev.type === "result") {
+            setExtractions(exs);
+            setAnswers(ev.result.answers);
+            setRes(ev.result);
+            setFb("idle"); setFbMsg(null);
+          }
+        }
+        if (done) break;
+      }
     } catch (e) {
       setError(e instanceof Error ? e.message : String(e));
+      if (!add) setPhotos([]);
+      else setPhotos(prevPhotos);
     } finally {
       setBusy(null);
       if (camRef.current) camRef.current.value = "";
@@ -174,16 +219,16 @@ export default function Home() {
   return (
     <main className="mx-auto max-w-xl px-4 pb-24 pt-6 text-gray-900">
       <header className="mb-6">
-        <p className="text-xs font-semibold uppercase tracking-wider text-red-700">Product Match · Prototyp M2</p>
+        <p className="text-xs font-semibold uppercase tracking-wider text-red-700">Product Match · Prototyp M3</p>
         <h1 className="text-2xl font-bold">Taschenmesser erkennen</h1>
         <p className="text-sm text-gray-600">
           Messer auf die <a className="underline" href="/messunterlage.pdf" target="_blank">Messunterlage</a> legen, aufklappen, von oben fotografieren.
-          Für mehr Sicherheit weitere Fotos mit anderen Werkzeugen hinzufügen.
+          Am besten mehrere Fotos mit je anderen Werkzeugen auf einmal hochladen.
         </p>
       </header>
 
-      <input ref={camRef} type="file" accept="image/*" capture="environment" className="hidden" onChange={(e) => onFile(e.target.files?.[0], extractions.length > 0)} />
-      <input ref={galleryRef} type="file" accept="image/*" className="hidden" onChange={(e) => onFile(e.target.files?.[0], extractions.length > 0)} />
+      <input ref={camRef} type="file" accept="image/*" capture="environment" className="hidden" onChange={(e) => onFiles(e.target.files, extractions.length > 0)} />
+      <input ref={galleryRef} type="file" accept="image/*" multiple className="hidden" onChange={(e) => onFiles(e.target.files, extractions.length > 0)} />
       {(() => {
         // once a knife is active every new photo is added to it, until "Neues Messer"
         const open = (ref: React.RefObject<HTMLInputElement | null>, _add: boolean) => ref.current?.click();
@@ -192,7 +237,7 @@ export default function Home() {
           <div
             onDragOver={(e) => { e.preventDefault(); setDrag(true); }}
             onDragLeave={() => setDrag(false)}
-            onDrop={(e) => { e.preventDefault(); setDrag(false); onFile(e.dataTransfer.files?.[0], hasKnife); }}
+            onDrop={(e) => { e.preventDefault(); setDrag(false); onFiles(e.dataTransfer.files, hasKnife); }}
             className={`rounded-2xl ${drag ? "ring-2 ring-red-700 ring-offset-4" : ""}`}
           >
             {!hasKnife ? (<>
@@ -202,7 +247,7 @@ export default function Home() {
               </button>
               <button onClick={() => open(galleryRef, false)} disabled={!!busy}
                 className="mt-2 w-full rounded-xl border border-gray-300 px-4 py-3 font-medium text-gray-800 disabled:opacity-50">
-                Bild aus Galerie wählen
+                Fotos aus Galerie wählen (mehrere möglich)
               </button>
             </>) : (<>
               <button onClick={() => open(camRef, true)} disabled={!!busy}
@@ -211,12 +256,12 @@ export default function Home() {
               </button>
               <div className="mt-2 grid grid-cols-2 gap-2">
                 <button onClick={() => open(galleryRef, true)} disabled={!!busy}
-                  className="rounded-xl border border-gray-300 px-3 py-3 text-sm font-medium text-gray-800 disabled:opacity-50">＋ Foto aus Galerie</button>
+                  className="rounded-xl border border-gray-300 px-3 py-3 text-sm font-medium text-gray-800 disabled:opacity-50">＋ Fotos aus Galerie</button>
                 <button onClick={reset} disabled={!!busy}
                   className="rounded-xl border border-gray-300 px-3 py-3 text-sm font-medium text-gray-800 disabled:opacity-50">Neues Messer</button>
               </div>
             </>)}
-            <p className="mt-2 hidden text-center text-xs text-gray-500 md:block">… oder ein Bild hierher ziehen</p>
+            <p className="mt-2 hidden text-center text-xs text-gray-500 md:block">… oder Bilder hierher ziehen</p>
           </div>
         );
       })()}
@@ -226,10 +271,31 @@ export default function Home() {
         <div className="mt-4 flex gap-2 overflow-x-auto">
           {photos.map((p, i) => (
             // eslint-disable-next-line @next/next/no-img-element
-            <img key={i} src={p} alt={`Foto ${i + 1}`} className="h-16 w-16 flex-none rounded-lg object-cover" />
+            <img key={i} src={p} alt={`Foto ${i + 1}`}
+              className={`h-16 w-16 flex-none rounded-lg object-cover ${busy && i >= extractions.length ? "animate-pulse opacity-60" : ""}`} />
           ))}
-          {busy && <div className="h-16 w-16 flex-none animate-pulse rounded-lg bg-gray-200" />}
         </div>
+      )}
+
+      {steps.length > 0 && (
+        <details open className="mt-4 rounded-xl border p-3 text-sm">
+          <summary className="cursor-pointer font-semibold">
+            Agent-Schritte {busy ? "· läuft …" : `· ${steps.length} Schritte${res?.agent_checks?.length ? `, ${res.agent_checks.length} Selbstprüfung${res.agent_checks.length > 1 ? "en" : ""}` : ""}`}
+          </summary>
+          <ol className="mt-2 space-y-1.5">
+            {steps.map((s) => (
+              <li key={s.id} className="flex gap-2">
+                <span className={`mt-0.5 w-4 flex-none text-center ${s.status === "run" ? "animate-pulse text-red-700" : s.status === "skip" ? "text-amber-600" : "text-green-700"}`}>
+                  {s.status === "run" ? "●" : s.status === "skip" ? "!" : "✓"}
+                </span>
+                <span>
+                  <span className="font-medium">{s.agent}</span> <span className="text-gray-700">{s.text}</span>
+                  {s.ms != null && <span className="text-xs text-gray-400"> · {(s.ms / 1000).toFixed(1)} s</span>}
+                </span>
+              </li>
+            ))}
+          </ol>
+        </details>
       )}
 
       {ex && (

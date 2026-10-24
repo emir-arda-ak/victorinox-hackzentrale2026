@@ -1,7 +1,7 @@
 import { TOOL_META } from "@/lib/catalog";
 
 /** visual hints for the tools that are most often confused on photos */
-const HINTS: Record<string, string> = {
+export const HINTS: Record<string, string> = {
   blade_large: "main cutting blade, long, one sharp edge",
   blade_small: "second, clearly shorter cutting blade",
   blade_gutting: "short CURVED blade with a blunt, rounded/upturned tip (gutting blade, typical on 130 mm Ranger knives)",
