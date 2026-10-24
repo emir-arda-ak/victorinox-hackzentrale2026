@@ -1,7 +1,7 @@
 import { CATALOG, CROSSREF, SCORING, TOOL_META, zoneFor } from "@/lib/catalog";
 import type { CatalogModel, ToolId, Visibility } from "@/lib/catalog.types";
 import type { Answers, Extraction } from "./schema";
-import { BLADE_TWIN, confirmedNonBladeWorking, excessScore, functionalCoverageScore, handlingScore, isWorking } from "./functional";
+import { BLADE_TWIN, confirmedNonBladeWorking, excessScore, functionalCoverageScore, handlingScore, isWorking, negativeToolScore } from "./functional";
 
 export type ToolRowStatus = "both" | "only_victorinox" | "missing" | "unknown";
 export type ToolRow = { tool: ToolId; label: string; status: ToolRowStatus };
@@ -19,7 +19,11 @@ export type Candidate = {
   /** function-first diagnostics (labels only for tools that were actually observed / confirmed) */
   functional?: {
     coverage: number | null; // weighted recall of observed working functions, null = none observed
+    confirmed_coverage: number | null;
+    confirmed_tool_count: number;
     matched_working_tools: string[];
+    partially_matched_working_tools: string[];
+    uncertain_matched_working_tools: string[];
     missing_working_tools: string[]; // confirmed on the photo / by the user, not in this model
     matched_handling_attributes: string[];
   };
@@ -50,18 +54,16 @@ export type Ranking = {
 const visW = (t: ToolId) => SCORING.tool_visibility_weight[(TOOL_META[t]?.visibility ?? "normal") as Visibility];
 const norm = (s: string | null | undefined) => (s ?? "").toLowerCase().replace(/[^a-z0-9]/g, "");
 
-/** net tool fit (recall AND penalties for unseen/answered-no tools), -1..1. workingOnly: ignore clip/thumb stud/lanyard/ring */
-function toolScore(c: CatalogModel, ex: Extraction, ans: Answers, workingOnly = false) {
-  const keep = (t: ToolId) => !workingOnly || isWorking(t);
+/** Legacy net tool fit for direct Victorinox identification only. */
+function toolScore(c: CatalogModel, ex: Extraction, ans: Answers) {
   const main = new Set<ToolId>(c.tools);
   const sub = new Set<ToolId>(c.subtools);
-  const seen = new Set<ToolId>([...ex.tools_seen, ...ans.tools_yes]);
-  const maybe = new Set<ToolId>(ex.tools_maybe.filter((t) => !seen.has(t)));
-  const no = new Set<ToolId>(ans.tools_no);
+  const no = new Set<ToolId>(ans.tools_no.filter(t => t !== "other"));
+  const seen = new Set<ToolId>([...ex.tools_seen, ...ans.tools_yes].filter(t => !no.has(t) && t !== "other"));
+  const maybe = new Set<ToolId>(ex.tools_maybe.filter((t) => !seen.has(t) && !no.has(t) && t !== "other"));
   let sum = 0;
   let norm_ = 0;
   for (const t of seen) {
-    if (t === "other" || !keep(t)) continue;
     const w = visW(t);
     norm_ += w;
     if (main.has(t)) sum += w;
@@ -70,22 +72,20 @@ function toolScore(c: CatalogModel, ex: Extraction, ans: Answers, workingOnly = 
     else sum -= w * SCORING.tool_seen_but_missing_penalty;
   }
   for (const t of maybe) {
-    if (!keep(t)) continue;
     const w = visW(t) * SCORING.tool_maybe_factor;
     norm_ += w;
     if (main.has(t) || sub.has(t)) sum += w;
   }
   for (const t of no) {
-    if (!keep(t)) continue;
     const w = visW(t);
     norm_ += w;
-    if (main.has(t)) sum -= w * SCORING.tool_answered_no_penalty;
+    if (main.has(t) || sub.has(t)) sum -= w * SCORING.tool_answered_no_penalty;
     else sum += w * 0.5;
   }
   // candidate tools that should have been visible but were not seen
   const unseenFactor = (SCORING.tool_unseen_penalty as Record<string, number>)[ex.open_state] ?? 0;
   for (const t of main) {
-    if (seen.has(t) || maybe.has(t) || no.has(t) || t === "other" || !keep(t)) continue;
+    if (seen.has(t) || maybe.has(t) || no.has(t) || t === "other") continue;
     const vis = TOOL_META[t]?.visibility;
     if (vis === "hidden") continue;
     const w = visW(t) * unseenFactor;
@@ -103,11 +103,9 @@ function lengthScore(c: CatalogModel, ex: Extraction, ans: Answers): { s: number
   const llmZone = zoneFor(zoneLabel);
   const zoneContradicts = !ans.length_zone && !!mm && !!llmZone && (mm < llmZone.from - 6 || mm > llmZone.to + 6);
   const zone = zoneContradicts ? undefined : llmZone;
-  const measured = !!zone?.class_mm || !!mm;
   if (c.length_mm == null) {
-    // catalog has no length (multitools, one-hand knives, cards): neutral, but a measured SAK should not drift to them
-    const s = measured && (c.category === "SAK" || c.category === "GARDEN") ? SCORING.length_unknown_candidate_score : 0;
-    return { s, conf: measured ? Math.max(zoneConf, 0.5) : 0 };
+    // Missing catalog data is neither a length match nor a mismatch, in every category.
+    return { s: 0, conf: 0 };
   }
   const sig = SCORING.length_sigma_mm;
   let sZone: number | null = null;
@@ -149,7 +147,7 @@ function effectiveCategory(ex: Extraction, ans: Answers): { category: Extraction
   if (ans.category) return { category: ans.category, trust: 1 }; // corrected by the user
   const single = ex.category === "ONEHAND" || ex.category === "FIXED";
   if (single && confirmedNonBladeWorking(ex, ans) >= SCORING.functional.category_conflict_min_tools) {
-    const pliers = [...ex.tools_seen, ...ans.tools_yes].includes("pliers");
+    const pliers = !ans.tools_no.includes("pliers") && [...ex.tools_seen, ...ans.tools_yes].includes("pliers");
     return { category: pliers ? "MULTITOOL" : "SAK", trust: SCORING.functional.category_conflict_factor };
   }
   return { category: ex.category, trust: 1 };
@@ -166,8 +164,9 @@ function nameScore(c: CatalogModel, ex: Extraction) {
 }
 
 function skuScore(c: CatalogModel, ex: Extraction) {
-  if (!ex.visible_sku) return 0;
+  if (!ex.visible_sku || ex.is_victorinox === false) return 0;
   const s = ex.visible_sku.trim().toUpperCase();
+  if (!s) return 0;
   if (c.id.toUpperCase() === s || c.variants.some((v) => v.sku.toUpperCase() === s)) return 1;
   // model prefix match, e.g. "1.3603" on a "1.3603.3" box
   return s.startsWith(c.id.toUpperCase()) || c.id.toUpperCase().startsWith(s) ? 0.5 : 0;
@@ -198,14 +197,13 @@ function crossrefScore(c: CatalogModel, ex: Extraction) {
 
 /** unvalidated user feedback ("this knife -> that model"), 0..1. NOT product data: in replacement mode it is
  *  gated by the candidate's functional coverage, so it cannot override a large confirmed-function mismatch. */
-function learnedScore(c: CatalogModel, ex: Extraction, learned: LearnedRule[], coverage: number | null, mode: MatchMode) {
+function learnedScore(c: CatalogModel, ex: Extraction, learned: LearnedRule[]) {
   let s = 0;
   for (const r of learned) {
     if (r.victorinox_id !== c.id) continue;
     s = Math.max(s, ruleSimilarity(ex, r) * Math.min(1, 0.6 + 0.2 * r.count));
   }
-  if (mode === "victorinox" || coverage == null) return s;
-  return s * Math.pow(coverage, SCORING.functional.learned_gate_power);
+  return s;
 }
 
 function materialScore(c: CatalogModel, ex: Extraction) {
@@ -222,27 +220,26 @@ function colorScore(c: CatalogModel, ex: Extraction) {
 
 /** how much the photo actually shows (0..1): few visible tools or folded knife = weak evidence */
 function evidence(ex: Extraction, ans: Answers) {
-  const seen = new Set([...ex.tools_seen, ...ans.tools_yes]);
+  const seen = new Set([...ex.tools_seen, ...ans.tools_yes].filter(t => t !== "other" && !ans.tools_no.includes(t)));
   let w = 0;
   for (const t of seen) w += visW(t);
   const base = Math.min(1, w / 3);
   const open = ex.open_state === "open" ? 1 : ex.open_state === "partly" ? 0.8 : 0.5;
-  return Math.max(0.2, base * open + (ans.tools_yes.length + ans.tools_no.length > 0 ? 0.1 : 0));
+  const answered = [...ans.tools_yes, ...ans.tools_no].some(t => t !== "other");
+  return Math.min(1, Math.max(0.2, base * open + (answered ? 0.1 : 0)));
 }
 
 function toolRows(c: CatalogModel, ex: Extraction, ans: Answers): ToolRow[] {
-  const seen = new Set<ToolId>([...ex.tools_seen, ...ans.tools_yes]);
+  const seen = new Set<ToolId>([...ex.tools_seen, ...ans.tools_yes].filter(t => !ans.tools_no.includes(t)));
   const cand = new Set<ToolId>([...c.tools, ...c.subtools]);
   const rows: ToolRow[] = [];
   for (const t of seen) {
     if (t === "other") continue;
-    const twin = BLADE_TWIN[t];
-    rows.push({ tool: t, label: TOOL_META[t].label, status: cand.has(t) || (!!twin && cand.has(twin)) ? "both" : "missing" });
+    rows.push({ tool: t, label: TOOL_META[t].label, status: cand.has(t) ? "both" : "missing" });
   }
-  for (const t of c.tools) {
+  for (const t of cand) {
     if (seen.has(t) || t === "other") continue;
-    const hidden = TOOL_META[t]?.visibility === "hidden" && !ans.tools_no.includes(t);
-    rows.push({ tool: t, label: TOOL_META[t].label, status: hidden ? "unknown" : "only_victorinox" });
+    rows.push({ tool: t, label: TOOL_META[t].label, status: ans.tools_no.includes(t) ? "only_victorinox" : "unknown" });
   }
   const order: Record<ToolRowStatus, number> = { both: 0, missing: 1, only_victorinox: 2, unknown: 3 };
   return rows.sort((a, b) => order[a.status] - order[b.status]);
@@ -252,7 +249,7 @@ export function score(ex: Extraction, ans: Answers, learned: LearnedRule[] = [])
   const excluded = new Set<string>(SCORING.excluded_categories);
   const mode = modeFor(ex);
   const M = (SCORING.modes as Record<MatchMode, Record<string, number>>)[mode];
-  const eff = effectiveCategory(ex, ans);
+  const eff = mode === "victorinox" ? { category: ans.category ?? ex.category, trust: 1 } : effectiveCategory(ex, ans);
   const catTrust = eff.trust;
   const exCat: Extraction = eff.category === ex.category ? ex : { ...ex, category: eff.category };
   // category counts fully only while there is little functional evidence (0–1 tools on one photo);
@@ -265,19 +262,23 @@ export function score(ex: Extraction, ans: Answers, learned: LearnedRule[] = [])
     const len = lengthScore(c, ex, ans);
     const fc = functionalCoverageScore(c, ex, ans);
     const hd = handlingScore(c, ex, ans);
+    // Neither manual recommendations nor feedback can bypass the functional evidence.
+    const supportCoverage = Math.min(fc.coverage ?? 0, fc.confirmedCoverage ?? fc.coverage ?? 0);
+    const supportGate = mode === "victorinox" ? 1 : Math.pow(supportCoverage, SCORING.functional.learned_gate_power);
     const parts: Record<string, number> = {
-      // victorinox mode: old net tool fit incl. handling; replacement modes: working functions only
-      tools: M.tools * toolScore(c, ex, ans, mode !== "victorinox"),
+      // Compatibility: tools retains legacy fit for identification; replacement uses explicit negatives only.
+      tools: M.tools * (mode === "victorinox" ? toolScore(c, ex, ans) : negativeToolScore(c, ans)),
       // recall of observed working functions mapped to -1..1 (0 = half covered); unknown -> neutral 0
-      functional_coverage: M.functional_coverage * (fc.coverage == null ? 0 : 2 * fc.coverage - 1),
-      handling: M.handling * (hd.score ?? 0),
+      functional_coverage: M.functional_coverage * (fc.coverage == null ? 0 : 2 * fc.coverage - 1) *
+        (fc.confirmed ? 1 : SCORING.functional.maybe_weight),
+      handling_similarity: M.handling * (hd.score ?? 0),
       excess: M.excess * excessScore(c, ex, ans),
       length: M.length * len.s * (0.4 + 0.6 * len.conf),
       category: catW * categoryScore(c, exCat, mode) * ex.category_confidence * catTrust,
       model_name: M.model_name * nameScore(c, ex),
       visible_sku: M.visible_sku * skuScore(c, ex),
-      crossref: M.crossref * crossrefScore(c, ex),
-      learned: M.learned * learnedScore(c, ex, learned, fc.coverage, mode),
+      crossref: M.crossref * crossrefScore(c, ex) * supportGate,
+      learned: M.learned * learnedScore(c, ex, learned) * supportGate,
       material: M.material * materialScore(c, ex),
       color: M.color * colorScore(c, ex),
     };
@@ -293,23 +294,38 @@ export function score(ex: Extraction, ans: Answers, learned: LearnedRule[] = [])
   const sig = (c: CatalogModel) => `${c.category}|${c.length_mm}|${[...c.tools].sort().join(",")}`;
   const rival = top.slice(1).find((x) => sig(x.c) !== sig(top[0].c));
   const margin = top[0] ? top[0].total - (rival?.total ?? 0) : 0;
-  // HEURISTIC reliability score (0..1), not a calibrated probability. Learned feedback does not count as fit.
-  const maxPossible = M.tools + M.functional_coverage + M.handling + M.length + catW;
-  const fit = Math.max(0, Math.min(1, ((top[0]?.total ?? 0) - (top[0]?.parts.learned ?? 0)) / maxPossible));
-  const sep = 1 - Math.exp(-SCORING.confidence.margin_scale * Math.max(0, margin));
-  let confidence = (0.5 * fit + 0.5 * sep) * (0.4 + 0.6 * evidence(ex, ans));
+  // HEURISTIC reliability score (0..1), not a calibrated probability.
+  // Category, appearance and either kind of reference never count as fit or separation.
+  const replacement = mode !== "victorinox";
+  const reliabilityScore = (x: typeof scored[number]) => replacement
+    ? x.parts.functional_coverage + x.parts.tools + x.parts.handling_similarity + x.parts.length
+    : x.parts.tools + x.parts.length + x.parts.model_name + x.parts.visible_sku;
+  const maxPossible = replacement ? M.functional_coverage + M.handling + M.length : M.tools + M.length + M.model_name;
+  const fit = Math.max(0, Math.min(1, (top[0] ? reliabilityScore(top[0]) : 0) / Math.max(1, maxPossible)));
+  // Compare against all distinct rivals, using fit alone. A category/reference bonus cannot inflate separation.
+  const fitRivals = top[0] ? scored.slice(1).filter(x => sig(x.c) !== sig(top[0].c)) : [];
+  const reliabilityMargin = top[0]
+    ? reliabilityScore(top[0]) - Math.max(0, ...fitRivals.map(reliabilityScore)) : 0;
+  const sep = 1 - Math.exp(-SCORING.confidence.margin_scale * Math.max(0, reliabilityMargin));
+  const C = SCORING.confidence;
+  let confidence = (C.fit_weight * fit + (1 - C.fit_weight) * sep) *
+    (C.minimum_evidence_factor + (1 - C.minimum_evidence_factor) * evidence(ex, ans));
   if (top[0]) {
+    const provided = new Set([...top[0].c.tools, ...top[0].c.subtools]);
     const missing = mode === "victorinox"
-      ? toolRows(top[0].c, ex, ans).filter((r) => r.status === "missing").length
+      ? [...new Set([...ex.tools_seen, ...ans.tools_yes])].filter(t => t !== "other" && !ans.tools_no.includes(t) &&
+        !provided.has(t) && !(BLADE_TWIN[t] && provided.has(BLADE_TWIN[t]!))).length
       : top[0].fc.missing.length;
     confidence *= Math.max(0.3, 1 - SCORING.confidence.missing_tool_factor * missing);
+    if (replacement) confidence = Math.min(confidence, top[0].fc.confirmedCoverage ?? C.no_confirmed_max);
     // a top spot that only exists thanks to unvalidated feedback must not be reported as "high"
     if (top[0].parts.learned > 0 && rival && top[0].total - top[0].parts.learned <= rival.total)
       confidence = Math.min(confidence, SCORING.confidence.high - 0.01);
   }
   // contradictory extraction (category vs. tools): never "high"
   if (catTrust < 1) confidence = Math.min(confidence, SCORING.confidence.high - 0.01);
-  if (top[0] && top[0].parts.visible_sku >= M.visible_sku) confidence = Math.max(confidence, 0.95);
+  if (mode === "victorinox" && top[0] && M.visible_sku > 0 && skuScore(top[0].c, ex) === 1)
+    confidence = Math.max(confidence, C.exact_sku_floor);
   confidence = Number.isFinite(confidence) ? Math.max(0, Math.min(1, confidence)) : 0;
 
   const reasons: string[] = [];
@@ -338,7 +354,11 @@ export function score(ex: Extraction, ans: Answers, learned: LearnedRule[] = [])
       source: c.source,
       functional: {
         coverage: fc.coverage == null ? null : Math.round(fc.coverage * 100) / 100,
+        confirmed_coverage: fc.confirmedCoverage == null ? null : Math.round(fc.confirmedCoverage * 100) / 100,
+        confirmed_tool_count: fc.confirmed,
         matched_working_tools: fc.matched.map((t) => TOOL_META[t].label),
+        partially_matched_working_tools: fc.partial.map((t) => TOOL_META[t].label),
+        uncertain_matched_working_tools: fc.uncertainMatched.map((t) => TOOL_META[t].label),
         missing_working_tools: fc.missing.map((t) => TOOL_META[t].label),
         matched_handling_attributes: hd.matched.map((t) => TOOL_META[t].label),
       },

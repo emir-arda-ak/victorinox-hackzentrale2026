@@ -27,13 +27,16 @@
   "tool_answered_no_penalty": 1.5,
   "length_alt_zone_score": 0.5,
   "length_sigma_mm": 8,
-  "length_unknown_candidate_score": -0.5,
   "length_mm_weight": 0.6,
   "confidence": {
     "margin_scale": 2.5,
     "missing_tool_factor": 0.2,
     "high": 0.75,
-    "medium": 0.5
+    "medium": 0.5,
+    "no_confirmed_max": 0.45,
+    "exact_sku_floor": 0.95,
+    "fit_weight": 0.5,
+    "minimum_evidence_factor": 0.4
   },
   "clarify": {
     "max_rounds": 2,
@@ -43,7 +46,7 @@
   "excluded_categories": [
     "OTHER"
   ],
-  "_comment_modes": "Gewichte pro Pfad. victorinox = Identifikation (bisheriges Verhalten). competitor/unknown = Ersatzempfehlung, Funktionen zuerst. Startwerte sind Hypothesen, nicht trainiert. Siehe eval/function_first_report.md.",
+  "_comment_modes": "Gewichte pro Pfad. victorinox = Identifikation (bisherige Ranking-Gewichte). competitor/unknown = Ersatzempfehlung, Funktionen zuerst. Startwerte sind Hypothesen, nicht trainiert. Siehe eval/ranking-audit/report.md.",
   "modes": {
     "victorinox": {
       "tools": 3.0,
@@ -62,37 +65,37 @@
     },
     "competitor": {
       "tools": 1.5,
-      "functional_coverage": 4.0,
+      "functional_coverage": 5.5,
       "handling": 0.75,
-      "length": 2.0,
+      "length": 1.0,
       "category": 1.0,
       "model_name": 0.0,
       "visible_sku": 10.0,
-      "crossref": 4.0,
-      "learned": 1.5,
+      "crossref": 0.75,
+      "learned": 0.75,
       "material": 0.25,
       "color": 0.2,
-      "excess": 1.0,
-      "category_low_evidence": 2.5
+      "excess": 2,
+      "category_low_evidence": 1.5
     },
     "unknown": {
-      "tools": 2.0,
-      "functional_coverage": 3.0,
-      "handling": 0.5,
-      "length": 2.0,
-      "category": 1.5,
+      "tools": 1.5,
+      "functional_coverage": 5.5,
+      "handling": 0.75,
+      "length": 1.0,
+      "category": 1.0,
       "model_name": 3.0,
       "visible_sku": 10.0,
-      "crossref": 4.0,
-      "learned": 2.0,
-      "material": 0.4,
-      "color": 0.4,
-      "excess": 0.5,
-      "category_low_evidence": 2.5
+      "crossref": 0.75,
+      "learned": 0.75,
+      "material": 0.25,
+      "color": 0.2,
+      "excess": 2,
+      "category_low_evidence": 1.5
     }
   },
   "functional": {
-    "_comment": "answer_weight: vom Nutzer bestätigte Werkzeuge zählen stärker als Vision; maybe_weight: unsichere Werkzeuge. learned_gate_power: gelernte Regeln wirken nur mit cov^power (Funktionsabdeckung des Kandidaten).",
+    "_comment": "Replacement: tools is explicit-negative penalty only; coverage is primary. Crossref and learned each <=0.75, both gated by min(total, confirmed) coverage^2. Unobserved tools have no absence penalty; excess is a weak complexity preference. Excess is capped at 2 versus an 11-point functional score span; low-information rings/lanyards carry less handling evidence. Maybe-only coverage is scaled by maybe_weight.",
     "answer_weight": 1.25,
     "maybe_weight": 0.4,
     "learned_gate_power": 2,
@@ -104,11 +107,16 @@
     },
     "category_conflict_min_tools": 2,
     "category_conflict_factor": 0.5,
-    "learned_only_win_max_level": "medium",
     "blade_variant_credit": 0.6,
     "excess_min_tools": 4,
     "excess_slack": 1.5,
     "excess_log_scale": 3,
-    "strong_evidence_tools": 3
+    "strong_evidence_tools": 3,
+    "handling_attribute_weight": {
+      "clip": 1,
+      "thumb_stud": 1,
+      "lanyard_hole": 0.25,
+      "key_ring": 0.25
+    }
   }
 }

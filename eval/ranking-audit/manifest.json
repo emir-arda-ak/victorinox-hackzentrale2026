@@ -1,0 +1,13 @@
+{
+  "date": "2026-10-24",
+  "baseline_commit": "d506c8bbda67a5f1e1f4d24347696a80743ccc20",
+  "legacy_commit": "7f3702e6150c9e0a57ecae6d380038ccb66db58f",
+  "cache_count": 123,
+  "cache_sha256_names_and_bytes": "6e0694f19036b2ccd40ccafb18c5afb0daddf7fbcbea5fc7168e567da59d3612",
+  "ground_truth_sha256": "c805d3d3947e2ab5d918901150f8520c6aec8b84e0710625f6296d36ee21bf67",
+  "catalog_sha256": "7ea7c21bdb835e2a71895db99ad4554bb52b3e13d44c16a4f40a442f9562020b",
+  "learned_rules": [],
+  "notes": "All versions use the same cached extractions and current ground truth. Offline execution bypasses Redis and vision. Comparator diagnostics use exact confirmed tool recall with fixed visibility weights; unknown/no evidence is excluded.",
+  "legacy_catalog_sha256": "7ea7c21bdb835e2a71895db99ad4554bb52b3e13d44c16a4f40a442f9562020b",
+  "before_catalog_sha256": "7ea7c21bdb835e2a71895db99ad4554bb52b3e13d44c16a4f40a442f9562020b"
+}

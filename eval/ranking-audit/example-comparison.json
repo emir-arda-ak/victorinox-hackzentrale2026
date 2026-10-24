@@ -1,0 +1,578 @@
+{
+  "extraction": {
+    "category": "ONEHAND",
+    "category_confidence": 0.785,
+    "brand": "Böker",
+    "brand_evidence": null,
+    "is_victorinox": false,
+    "model_guess": null,
+    "visible_sku": null,
+    "open_state": "open",
+    "tools_seen": [
+      "blade_large",
+      "clip",
+      "corkscrew",
+      "scissors"
+    ],
+    "tools_maybe": [
+      "other",
+      "saw_wood"
+    ],
+    "sheet_visible": true,
+    "length_zone": "111",
+    "length_zone_alt": null,
+    "length_zone_confidence": 0.78,
+    "length_estimate_mm": 102.5,
+    "scale_color": "schwarz",
+    "scale_material": "Andere",
+    "description": "",
+    "image_issues": []
+  },
+  "answers": {
+    "tools_yes": [
+      "thumb_stud"
+    ],
+    "tools_no": [],
+    "length_zone": null,
+    "category": null,
+    "rounds": 0
+  },
+  "learned_rule": {
+    "brand": "Böker",
+    "model": null,
+    "category": "ONEHAND",
+    "zone": "111",
+    "tools": [
+      "blade_large",
+      "clip",
+      "corkscrew",
+      "scissors"
+    ],
+    "victorinox_id": "0.9415.DS23",
+    "count": 5
+  },
+  "versions": {
+    "legacy": {
+      "without_rule": {
+        "top3": [
+          {
+            "id": "0.9415.DS23",
+            "name": "Evoke Bs Alox",
+            "score": 2.59,
+            "parts": {
+              "tools": 0.12,
+              "length": 0,
+              "category": 1.96,
+              "model_name": 0,
+              "visible_sku": 0,
+              "crossref": 0,
+              "material": 0,
+              "color": 0.5
+            }
+          },
+          {
+            "id": "0.9425.DS222",
+            "name": "Evoke Bsh Alox",
+            "score": 2.59,
+            "parts": {
+              "tools": 0.12,
+              "length": 0,
+              "category": 1.96,
+              "model_name": 0,
+              "visible_sku": 0,
+              "crossref": 0,
+              "material": 0,
+              "color": 0.5
+            }
+          },
+          {
+            "id": "0.9411.D20",
+            "name": "Evoke Alox",
+            "score": 2.09,
+            "parts": {
+              "tools": 0.12,
+              "length": 0,
+              "category": 1.96,
+              "model_name": 0,
+              "visible_sku": 0,
+              "crossref": 0,
+              "material": 0,
+              "color": 0
+            }
+          }
+        ],
+        "confidence": 0.42,
+        "level": "low"
+      },
+      "with_rule": {
+        "top3": [
+          {
+            "id": "0.9415.DS23",
+            "name": "Evoke Bs Alox",
+            "score": 6.59,
+            "parts": {
+              "tools": 0.12,
+              "length": 0,
+              "category": 1.96,
+              "model_name": 0,
+              "visible_sku": 0,
+              "crossref": 4,
+              "material": 0,
+              "color": 0.5
+            }
+          },
+          {
+            "id": "0.9425.DS222",
+            "name": "Evoke Bsh Alox",
+            "score": 2.59,
+            "parts": {
+              "tools": 0.12,
+              "length": 0,
+              "category": 1.96,
+              "model_name": 0,
+              "visible_sku": 0,
+              "crossref": 0,
+              "material": 0,
+              "color": 0.5
+            }
+          },
+          {
+            "id": "0.9411.D20",
+            "name": "Evoke Alox",
+            "score": 2.09,
+            "parts": {
+              "tools": 0.12,
+              "length": 0,
+              "category": 1.96,
+              "model_name": 0,
+              "visible_sku": 0,
+              "crossref": 0,
+              "material": 0,
+              "color": 0
+            }
+          }
+        ],
+        "confidence": 0.6,
+        "level": "medium"
+      }
+    },
+    "before": {
+      "without_rule": {
+        "top3": [
+          {
+            "id": "0.8513",
+            "name": "Outrider",
+            "score": 5.74,
+            "parts": {
+              "tools": 0.91,
+              "functional_coverage": 4,
+              "handling": 0,
+              "excess": -0.38,
+              "length": 0.63,
+              "category": 0.39,
+              "model_name": 0,
+              "visible_sku": 0,
+              "crossref": 0,
+              "learned": 0,
+              "material": 0,
+              "color": 0.2
+            },
+            "functional": {
+              "coverage": 1,
+              "matched_working_tools": [
+                "Holzsäge",
+                "Grosse Klinge",
+                "Korkenzieher",
+                "Schere"
+              ],
+              "missing_working_tools": [],
+              "matched_handling_attributes": []
+            }
+          },
+          {
+            "id": "0.8564",
+            "name": "Work Champ",
+            "score": 4.99,
+            "parts": {
+              "tools": 0.48,
+              "functional_coverage": 4,
+              "handling": 0,
+              "excess": -0.51,
+              "length": 0.63,
+              "category": 0.39,
+              "model_name": 0,
+              "visible_sku": 0,
+              "crossref": 0,
+              "learned": 0,
+              "material": 0,
+              "color": 0
+            },
+            "functional": {
+              "coverage": 1,
+              "matched_working_tools": [
+                "Holzsäge",
+                "Grosse Klinge",
+                "Korkenzieher",
+                "Schere"
+              ],
+              "missing_working_tools": [],
+              "matched_handling_attributes": []
+            }
+          },
+          {
+            "id": "0.8564.XL",
+            "name": "Work Champ Xl",
+            "score": 4.47,
+            "parts": {
+              "tools": 0.09,
+              "functional_coverage": 4,
+              "handling": 0,
+              "excess": -0.64,
+              "length": 0.63,
+              "category": 0.39,
+              "model_name": 0,
+              "visible_sku": 0,
+              "crossref": 0,
+              "learned": 0,
+              "material": 0,
+              "color": 0
+            },
+            "functional": {
+              "coverage": 1,
+              "matched_working_tools": [
+                "Holzsäge",
+                "Grosse Klinge",
+                "Korkenzieher",
+                "Schere"
+              ],
+              "missing_working_tools": [],
+              "matched_handling_attributes": []
+            }
+          }
+        ],
+        "confidence": 0.74,
+        "level": "medium"
+      },
+      "with_rule": {
+        "top3": [
+          {
+            "id": "0.8513",
+            "name": "Outrider",
+            "score": 5.74,
+            "parts": {
+              "tools": 0.91,
+              "functional_coverage": 4,
+              "handling": 0,
+              "excess": -0.38,
+              "length": 0.63,
+              "category": 0.39,
+              "model_name": 0,
+              "visible_sku": 0,
+              "crossref": 0,
+              "learned": 0,
+              "material": 0,
+              "color": 0.2
+            },
+            "functional": {
+              "coverage": 1,
+              "matched_working_tools": [
+                "Holzsäge",
+                "Grosse Klinge",
+                "Korkenzieher",
+                "Schere"
+              ],
+              "missing_working_tools": [],
+              "matched_handling_attributes": []
+            }
+          },
+          {
+            "id": "0.8564",
+            "name": "Work Champ",
+            "score": 4.99,
+            "parts": {
+              "tools": 0.48,
+              "functional_coverage": 4,
+              "handling": 0,
+              "excess": -0.51,
+              "length": 0.63,
+              "category": 0.39,
+              "model_name": 0,
+              "visible_sku": 0,
+              "crossref": 0,
+              "learned": 0,
+              "material": 0,
+              "color": 0
+            },
+            "functional": {
+              "coverage": 1,
+              "matched_working_tools": [
+                "Holzsäge",
+                "Grosse Klinge",
+                "Korkenzieher",
+                "Schere"
+              ],
+              "missing_working_tools": [],
+              "matched_handling_attributes": []
+            }
+          },
+          {
+            "id": "0.8564.XL",
+            "name": "Work Champ Xl",
+            "score": 4.47,
+            "parts": {
+              "tools": 0.09,
+              "functional_coverage": 4,
+              "handling": 0,
+              "excess": -0.64,
+              "length": 0.63,
+              "category": 0.39,
+              "model_name": 0,
+              "visible_sku": 0,
+              "crossref": 0,
+              "learned": 0,
+              "material": 0,
+              "color": 0
+            },
+            "functional": {
+              "coverage": 1,
+              "matched_working_tools": [
+                "Holzsäge",
+                "Grosse Klinge",
+                "Korkenzieher",
+                "Schere"
+              ],
+              "missing_working_tools": [],
+              "matched_handling_attributes": []
+            }
+          }
+        ],
+        "confidence": 0.74,
+        "level": "medium"
+      }
+    },
+    "after": {
+      "without_rule": {
+        "top3": [
+          {
+            "id": "0.8513",
+            "name": "Outrider",
+            "score": 5.64,
+            "parts": {
+              "tools": 0,
+              "functional_coverage": 5.5,
+              "handling_similarity": 0,
+              "excess": -0.77,
+              "length": 0.31,
+              "category": 0.39,
+              "model_name": 0,
+              "visible_sku": 0,
+              "crossref": 0,
+              "learned": 0,
+              "material": 0,
+              "color": 0.2
+            },
+            "functional": {
+              "coverage": 1,
+              "confirmed_coverage": 1,
+              "confirmed_tool_count": 3,
+              "matched_working_tools": [
+                "Grosse Klinge",
+                "Korkenzieher",
+                "Schere"
+              ],
+              "partially_matched_working_tools": [],
+              "uncertain_matched_working_tools": [
+                "Holzsäge"
+              ],
+              "missing_working_tools": [],
+              "matched_handling_attributes": []
+            }
+          },
+          {
+            "id": "0.8564",
+            "name": "Work Champ",
+            "score": 5.19,
+            "parts": {
+              "tools": 0,
+              "functional_coverage": 5.5,
+              "handling_similarity": 0,
+              "excess": -1.02,
+              "length": 0.31,
+              "category": 0.39,
+              "model_name": 0,
+              "visible_sku": 0,
+              "crossref": 0,
+              "learned": 0,
+              "material": 0,
+              "color": 0
+            },
+            "functional": {
+              "coverage": 1,
+              "confirmed_coverage": 1,
+              "confirmed_tool_count": 3,
+              "matched_working_tools": [
+                "Grosse Klinge",
+                "Korkenzieher",
+                "Schere"
+              ],
+              "partially_matched_working_tools": [],
+              "uncertain_matched_working_tools": [
+                "Holzsäge"
+              ],
+              "missing_working_tools": [],
+              "matched_handling_attributes": []
+            }
+          },
+          {
+            "id": "0.8564.XL",
+            "name": "Work Champ Xl",
+            "score": 4.93,
+            "parts": {
+              "tools": 0,
+              "functional_coverage": 5.5,
+              "handling_similarity": 0,
+              "excess": -1.28,
+              "length": 0.31,
+              "category": 0.39,
+              "model_name": 0,
+              "visible_sku": 0,
+              "crossref": 0,
+              "learned": 0,
+              "material": 0,
+              "color": 0
+            },
+            "functional": {
+              "coverage": 1,
+              "confirmed_coverage": 1,
+              "confirmed_tool_count": 3,
+              "matched_working_tools": [
+                "Grosse Klinge",
+                "Korkenzieher",
+                "Schere"
+              ],
+              "partially_matched_working_tools": [],
+              "uncertain_matched_working_tools": [
+                "Holzsäge"
+              ],
+              "missing_working_tools": [],
+              "matched_handling_attributes": []
+            }
+          }
+        ],
+        "confidence": 0.4,
+        "level": "low"
+      },
+      "with_rule": {
+        "top3": [
+          {
+            "id": "0.8513",
+            "name": "Outrider",
+            "score": 5.64,
+            "parts": {
+              "tools": 0,
+              "functional_coverage": 5.5,
+              "handling_similarity": 0,
+              "excess": -0.77,
+              "length": 0.31,
+              "category": 0.39,
+              "model_name": 0,
+              "visible_sku": 0,
+              "crossref": 0,
+              "learned": 0,
+              "material": 0,
+              "color": 0.2
+            },
+            "functional": {
+              "coverage": 1,
+              "confirmed_coverage": 1,
+              "confirmed_tool_count": 3,
+              "matched_working_tools": [
+                "Grosse Klinge",
+                "Korkenzieher",
+                "Schere"
+              ],
+              "partially_matched_working_tools": [],
+              "uncertain_matched_working_tools": [
+                "Holzsäge"
+              ],
+              "missing_working_tools": [],
+              "matched_handling_attributes": []
+            }
+          },
+          {
+            "id": "0.8564",
+            "name": "Work Champ",
+            "score": 5.19,
+            "parts": {
+              "tools": 0,
+              "functional_coverage": 5.5,
+              "handling_similarity": 0,
+              "excess": -1.02,
+              "length": 0.31,
+              "category": 0.39,
+              "model_name": 0,
+              "visible_sku": 0,
+              "crossref": 0,
+              "learned": 0,
+              "material": 0,
+              "color": 0
+            },
+            "functional": {
+              "coverage": 1,
+              "confirmed_coverage": 1,
+              "confirmed_tool_count": 3,
+              "matched_working_tools": [
+                "Grosse Klinge",
+                "Korkenzieher",
+                "Schere"
+              ],
+              "partially_matched_working_tools": [],
+              "uncertain_matched_working_tools": [
+                "Holzsäge"
+              ],
+              "missing_working_tools": [],
+              "matched_handling_attributes": []
+            }
+          },
+          {
+            "id": "0.8564.XL",
+            "name": "Work Champ Xl",
+            "score": 4.93,
+            "parts": {
+              "tools": 0,
+              "functional_coverage": 5.5,
+              "handling_similarity": 0,
+              "excess": -1.28,
+              "length": 0.31,
+              "category": 0.39,
+              "model_name": 0,
+              "visible_sku": 0,
+              "crossref": 0,
+              "learned": 0,
+              "material": 0,
+              "color": 0
+            },
+            "functional": {
+              "coverage": 1,
+              "confirmed_coverage": 1,
+              "confirmed_tool_count": 3,
+              "matched_working_tools": [
+                "Grosse Klinge",
+                "Korkenzieher",
+                "Schere"
+              ],
+              "partially_matched_working_tools": [],
+              "uncertain_matched_working_tools": [
+                "Holzsäge"
+              ],
+              "missing_working_tools": [],
+              "matched_handling_attributes": []
+            }
+          }
+        ],
+        "confidence": 0.4,
+        "level": "low"
+      }
+    }
+  }
+}

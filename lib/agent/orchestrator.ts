@@ -118,7 +118,7 @@ export async function runAgent(input: AgentInput, emit: (e: AgentEvent) => void,
   let res = decide(merged, ans, learned, timings);
   const checks: AgentCheck[] = [];
   const top3 = () => res.ranking?.candidates.slice(0, 3).map((c) => c.name).join(", ") ?? "";
-  if (res.ranking) step("rank-0", "Recommendation-Agent", "done", `Top-3: ${top3()} · Konfidenz ${Math.round(res.ranking.confidence * 100)} %`);
+  if (res.ranking) step("rank-0", "Recommendation-Agent", "done", `Top-3: ${top3()} · Heuristische Zuverlässigkeit ${Math.round(res.ranking.confidence * 100)}/100`);
 
   for (let i = 0; i < MAX_SELF_CHECKS && res.question?.type === "tool"; i++) {
     const q = res.question;
@@ -146,7 +146,7 @@ export async function runAgent(input: AgentInput, emit: (e: AgentEvent) => void,
     res = decide(merged, ans, learned, timings);
     const changed = res.ranking?.candidates[0]?.id !== before;
     if (res.ranking) step(`rank-${i + 1}`, "Recommendation-Agent", "done",
-      `${changed ? "Neue Rangliste" : "Rangliste bestätigt"}: ${top3()} · Konfidenz ${Math.round(res.ranking.confidence * 100)} %`);
+      `${changed ? "Neue Rangliste" : "Rangliste bestätigt"}: ${top3()} · Heuristische Zuverlässigkeit ${Math.round(res.ranking.confidence * 100)}/100`);
   }
 
   if (res.ranking) {

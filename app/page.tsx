@@ -403,10 +403,11 @@ export default function Home() {
           <div className="rounded-xl border p-4 shadow-sm">
             <div className="flex items-start justify-between gap-2">
               <span className={`rounded-full px-2 py-0.5 text-xs font-medium ${LEVEL[res.ranking.level].cls}`}>
-                {LEVEL[res.ranking.level].text} · {Math.round(res.ranking.confidence * 100)} %
+                {LEVEL[res.ranking.level].text} · Zuverlässigkeit {Math.round(res.ranking.confidence * 100)}/100
               </span>
               <span className="text-xs text-gray-500">Aktuell erhältlich</span>
             </div>
+            <p className="mt-1 text-xs text-gray-500">Heuristischer Wert, keine kalibrierte Wahrscheinlichkeit.</p>
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img src={top[0].image} alt={top[0].name} className="mx-auto my-3 h-44 object-contain" />
             <h2 className="text-xl font-bold">{top[0].name}</h2>

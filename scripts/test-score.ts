@@ -1,10 +1,11 @@
 /* Offline sanity test for scoring + clarify with hand-written extractions (no API key needed).
-   Run: npx tsx scripts/test-score.ts */
+   Run: npm test */
 import { decide } from "@/lib/agent/pipeline";
 import { AnswersSchema, type Extraction } from "@/lib/agent/schema";
 import { score, type LearnedRule } from "@/lib/agent/score";
-import { functionalCoverageScore } from "@/lib/agent/functional";
-import { byId } from "@/lib/catalog";
+import { functionalCoverageScore, handlingScore } from "@/lib/agent/functional";
+import { byId, CATALOG, CROSSREF, SCORING } from "@/lib/catalog";
+import { TOOL_IDS, type CatalogModel } from "@/lib/catalog.types";
 
 const base: Extraction = {
   category: "SAK", category_confidence: 0.9, brand: null, brand_evidence: null, is_victorinox: null,
@@ -113,6 +114,106 @@ console.log("\n--- function-first ---");
     ok &&= JSON.stringify(r1.candidates.map((c) => c.id)) === JSON.stringify(r2.candidates.map((c) => c.id));
   }
   check("5 Keine NaN, Konfidenz in [0,1], stabile Reihenfolge", ok);
+}
+// Synthetic catalogs keep the functional contract independent of particular brands/SKUs.
+{
+  const originalCatalog = CATALOG.slice();
+  const originalCrossref = CROSSREF.slice();
+  const template = byId.get("1.3703")!;
+  const make = (id: string, tools: CatalogModel["tools"], category: CatalogModel["category"] = "SAK"): CatalogModel =>
+    ({ ...template, id, name: id, name_catalog: id, tools, subtools: [], category,
+      length_mm: null, variants: [], scale_material: null });
+  const good = make("functional-match", ["blade_large", "scissors", "corkscrew"]);
+  const poor = make("handling-match", ["blade_large", "clip", "thumb_stud"], "ONEHAND");
+  const ex: Extraction = { ...boeker, brand: "Test maker", model_guess: "Test knife", tools_maybe: [],
+    length_zone: null, length_estimate_mm: null, scale_color: null, scale_material: null };
+  const rules: LearnedRule[] = [{ brand: ex.brand, model: ex.model_guess, category: ex.category,
+    zone: null, tools: ex.tools_seen, victorinox_id: poor.id, count: 1000000 }];
+  const install = (...models: CatalogModel[]) => CATALOG.splice(0, CATALOG.length, ...models);
+  try {
+    install(good, poor);
+    const original = JSON.stringify(ex);
+    const initial = score(ex, boekerAns);
+    const bladeOnly = score({ ...ex, tools_seen: ["blade_large", "clip", "thumb_stud"] }, A());
+    check("6a0 Single-blade source still prefers matching handling", bladeOnly.candidates[0].id === poor.id);
+    CROSSREF.push({ brand: ex.brand!, model: ex.model_guess!, category: ex.category, length_mm: null,
+      tools: ex.tools_seen, source_url: null, preferred_match: poor.id });
+    const boosted = score(ex, boekerAns, rules);
+    const bad = boosted.candidates.find(c => c.id === poor.id)!;
+    check("6a Manual + learned references cannot override multiple missing functions", boosted.candidates[0].id === good.id &&
+      bad.parts.crossref > 0 && bad.parts.crossref + bad.parts.learned < SCORING.modes.competitor.crossref + SCORING.modes.competitor.learned);
+    check("6b Support cannot inflate confidence for the same winner", boosted.confidence <= initial.confidence);
+    check("6c Category conflict does not mutate extraction", JSON.stringify(ex) === original);
+    const refOnly = score({ ...ex, tools_seen: [], tools_maybe: [], open_state: "closed" }, A(), rules);
+    check("6d No functional evidence: references neutral and reliability low", refOnly.candidates.every(c => c.parts.crossref === 0 && c.parts.learned === 0) && refOnly.level === "low");
+    const accidentalSku = score({ ...ex, visible_sku: poor.id }, boekerAns, rules);
+    check("6e Competitor article number is not exact Victorinox identification", accidentalSku.candidates[0].id === good.id && accidentalSku.candidates.every(c => c.parts.visible_sku === 0));
+    install(poor);
+    const incomplete = score(ex, boekerAns, rules);
+    check("6f Missing multiple confirmed functions caps reliability", incomplete.confidence < SCORING.confidence.medium);
+    const direct = { ...ex, is_victorinox: true, tools_seen: ["blade_large"] } as Extraction;
+    const withSupport = score(direct, A(), rules);
+    CROSSREF.splice(originalCrossref.length);
+    const withoutSupport = score(direct, A());
+    check("6g Victorinox references cannot inflate reliability either", withSupport.confidence <= withoutSupport.confidence);
+
+    install(good, { ...good, id: "extra-tool", name: "extra-tool", tools: [...good.tools, "saw_wood"] });
+    const extras = score(ex, A());
+    check("7a One unseen additional tool is not an absence penalty", extras.candidates[0].score === extras.candidates[1].score && extras.candidates.every(c => c.parts.tools === 0));
+    const extra = extras.candidates.find(c => c.id === "extra-tool")!;
+    check("7b Unseen tool remains unknown in comparison", extra.tools.find(t => t.tool === "saw_wood")?.status === "unknown");
+    const negative = score(ex, A({ tools_no: ["saw_wood"] }));
+    check("7c Explicit negative penalizes candidate with that tool", negative.candidates[0].id === good.id && negative.candidates[1].parts.tools < 0);
+    install({ ...good, id: "with-subtool", subtools: ["screwdriver", "clip"] }, good);
+    const subNo = score(ex, A({ tools_no: ["screwdriver", "clip"] }));
+    check("7d Negative answers include subtools and handling", subNo.candidates[0].id === good.id && subNo.candidates[1].parts.tools < 0);
+    const conflictAns = A({ tools_yes: ["scissors", "clip"], tools_no: ["scissors", "clip"] });
+    const contradiction = score(ex, conflictAns);
+    check("7e No overrides conflicting yes and vision consistently", contradiction.candidates.every(c =>
+      !c.functional!.matched_working_tools.includes("Schere") && !c.functional!.matched_handling_attributes.includes("Trageclip") &&
+      c.tools.filter(t => t.tool === "scissors" || t.tool === "clip").every(t => t.status === "only_victorinox")));
+
+    install(good, poor);
+    const onlyMaybe = score({ ...ex, tools_seen: [], tools_maybe: ["scissors"] }, A());
+    const seen = score({ ...ex, tools_seen: ["scissors"], tools_maybe: [] }, A());
+    const maybeGap = onlyMaybe.candidates[0].score - onlyMaybe.candidates[1].score;
+    const seenGap = seen.candidates[0].score - seen.candidates[1].score;
+    check("8a Even a lone maybe-tool counts less than confirmed evidence", maybeGap < seenGap && onlyMaybe.level !== "high");
+    const maybeFc = functionalCoverageScore(poor, { ...ex, tools_seen: ["blade_large"], tools_maybe: ["scissors"] }, A());
+    const seenFc = functionalCoverageScore(poor, { ...ex, tools_seen: ["blade_large", "scissors"], tools_maybe: [] }, A());
+    const yesFc = functionalCoverageScore(poor, { ...ex, tools_seen: ["blade_large"], tools_maybe: [] }, A({ tools_yes: ["scissors"] }));
+    check("8b maybe < seen < user-confirmed when a function is missing", maybeFc.coverage! > seenFc.coverage! && seenFc.coverage! > yesFc.coverage!);
+    const diag = onlyMaybe.candidates.find(c => c.id === good.id)!.functional!;
+    check("8c Maybe matches are not labelled as confirmed", diag.matched_working_tools.length === 0 && diag.uncertain_matched_working_tools.length === 1);
+    check("8d Other is ignored in all evidence channels", JSON.stringify(score(ex, A())) === JSON.stringify(score({ ...ex, tools_seen: [...ex.tools_seen, "other"], tools_maybe: ["other"] }, A({ tools_yes: ["other"], tools_no: ["other"] }))));
+    const clip = handlingScore(poor, { ...ex, tools_seen: ["clip"] }, A()).score!;
+    const ring = handlingScore({ ...poor, tools: ["key_ring"] }, { ...ex, tools_seen: ["key_ring"] }, A()).score!;
+    check("8e A ring is weaker handling evidence than a clip", ring < clip);
+
+    install(...(["SAK", "GARDEN", "ONEHAND", "MULTITOOL"] as const).map(cat => make(cat, ["blade_large"], cat)));
+    check("9 Unknown candidate lengths neutral for every category", score({ ...ex, length_estimate_mm: 100, length_zone: "100" }, A()).candidates.every(c => c.parts.length === 0));
+    const noPliers = score({ ...ex, tools_seen: [...ex.tools_seen, "pliers"] }, A({ tools_no: ["pliers"] }));
+    check("9b Denied pliers cannot steer category correction", noPliers.reasons.some(r => r.includes("bewertet als Taschenmesser")));
+  } finally {
+    CATALOG.splice(0, CATALOG.length, ...originalCatalog);
+    CROSSREF.splice(0, CROSSREF.length, ...originalCrossref);
+  }
+}
+{
+  const model = byId.get("1.3603")!;
+  const named = score({ ...base, is_victorinox: true, model_guess: model.name_catalog, tools_seen: model.tools, length_zone: "91/93" }, A());
+  check("10a Strong Victorinox model identification remains first", named.candidates[0].id === model.id);
+  const variant = model.variants.find(v => v.sku !== model.id)!;
+  const identified = score({ ...base, is_victorinox: true, visible_sku: variant.sku, tools_seen: ["blade_large"] }, A());
+  check("10b Exact Victorinox variant SKU remains first with strong reliability", identified.candidates[0].id === model.id && identified.confidence >= 0.95);
+  const blank = score({ ...base, is_victorinox: true, visible_sku: "   " }, A());
+  check("10c Blank SKU is never a prefix match", blank.candidates.every(c => c.parts.visible_sku === 0));
+  const inputs: Extraction[] = TOOL_IDS.map((tool, i) => ({ ...base, is_victorinox: i % 2 === 0, tools_seen: [tool], tools_maybe: [TOOL_IDS[(i + 1) % TOOL_IDS.length]] }));
+  inputs.push({ ...boeker, category_confidence: NaN, length_estimate_mm: Infinity, length_zone_confidence: NaN });
+  check("11 Full tool vocabulary, malformed numbers: finite and deterministic", inputs.every(ex => {
+    const r = score(ex, A());
+    return r.confidence >= 0 && r.confidence <= 1 && r.candidates.every(c => Number.isFinite(c.score) && Object.values(c.parts).every(Number.isFinite)) && JSON.stringify(r) === JSON.stringify(score(ex, A()));
+  }));
 }
 console.log(`\nfunction-first: ${fails === 0 ? "alle bestanden" : fails + " fehlgeschlagen"}`);
 if (fails || pass !== cases.length) process.exitCode = 1;

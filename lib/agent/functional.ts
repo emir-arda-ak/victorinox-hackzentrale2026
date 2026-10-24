@@ -26,9 +26,11 @@ const visW = (t: ToolId) => SCORING.tool_visibility_weight[(TOOL_META[t]?.visibi
 export type FunctionalCoverage = {
   /** weighted recall of the observed working functions, 0..1; null = no working function observed (unknown, not perfect) */
   coverage: number | null;
-  matched: ToolId[]; // observed working functions the candidate has (main tool, sub-tool or blade twin)
+  confirmedCoverage: number | null; // recall using only seen / explicitly confirmed tools
+  matched: ToolId[]; // confirmed working functions with full credit
   missing: ToolId[]; // CONFIRMED working functions the candidate lacks (maybe-tools are not listed)
   partial: ToolId[]; // matched only as sub-tool or other blade size (not an exact match)
+  uncertainMatched: ToolId[]; // maybe-tools supported by the candidate; never claimed as confirmed
   confirmed: number; // number of confirmed working functions (seen or answered yes)
 };
 
@@ -38,7 +40,8 @@ export function observedTools(ex: Extraction, ans: Answers) {
   const w = new Map<ToolId, number>();
   for (const t of ex.tools_maybe) if (!no.has(t) && t !== "other") w.set(t, F.maybe_weight);
   for (const t of ex.tools_seen) if (!no.has(t) && t !== "other") w.set(t, 1);
-  for (const t of ans.tools_yes) if (t !== "other") w.set(t, F.answer_weight);
+  // Conflicting yes/no answers: explicit no wins consistently throughout scoring and explanations.
+  for (const t of ans.tools_yes) if (!no.has(t) && t !== "other") w.set(t, F.answer_weight);
   return w; // tool -> confidence weight
 }
 
@@ -67,23 +70,40 @@ export function functionalCoverageScore(c: CatalogModel, ex: Extraction, ans: An
   let num = 0;
   let den = 0;
   let confirmed = 0;
+  let confirmedNum = 0;
+  let confirmedDen = 0;
   const matched: ToolId[] = [];
   const missing: ToolId[] = [];
   const partial: ToolId[] = [];
+  const uncertainMatched: ToolId[] = [];
+  const confirmedTools = new Set([...ex.tools_seen, ...ans.tools_yes]);
   for (const [t, conf] of obs) {
     if (!isWorking(t)) continue;
     const w = visW(t) * conf;
     const cr = credit(c, t);
     den += w;
     num += w * cr;
-    const isConfirmed = conf >= 1;
-    if (isConfirmed) confirmed++;
-    if (cr > 0) {
-      matched.push(t);
-      if (cr < 1) partial.push(t);
-    } else if (isConfirmed) missing.push(t);
+    if (confirmedTools.has(t)) {
+      confirmed++;
+      confirmedNum += w * cr;
+      confirmedDen += w;
+      if (cr === 1) matched.push(t);
+      else if (cr > 0) partial.push(t);
+      else missing.push(t);
+    } else if (cr > 0) uncertainMatched.push(t);
   }
-  return { coverage: den > 0 ? num / den : null, matched, missing, partial, confirmed };
+  return { coverage: den > 0 ? num / den : null,
+    confirmedCoverage: confirmedDen > 0 ? confirmedNum / confirmedDen : null,
+    matched, missing, partial, uncertainMatched, confirmed };
+}
+
+/** Only explicit absence is negative evidence. Extra unseen tools are not evidence of a mismatch.
+ * Includes handling attributes and subtools; duplicates and `other` never change the score. */
+export function negativeToolScore(c: CatalogModel, ans: Answers): number {
+  const no = [...new Set(ans.tools_no)].filter(t => t !== "other");
+  const denominator = no.reduce((sum, t) => sum + visW(t), 0);
+  const present = no.reduce((sum, t) => sum + (c.tools.includes(t) || c.subtools.includes(t) ? visW(t) : 0), 0);
+  return denominator ? -present / denominator : 0;
 }
 
 /** overlap of carrying/opening attributes (clip, thumb stud, lanyard, key ring), 0..1; null = none observed.
@@ -95,13 +115,14 @@ export function handlingScore(c: CatalogModel, ex: Extraction, ans: Answers): { 
   const matched: ToolId[] = [];
   for (const [t, conf] of obs) {
     if (!HANDLING.has(t)) continue;
-    den += conf;
+    const weight = conf * (F.handling_attribute_weight as Record<string, number>)[t];
+    den += weight;
     if (c.tools.includes(t) || c.subtools.includes(t)) {
-      num += conf;
-      matched.push(t);
+      num += weight;
+      if (ex.tools_seen.includes(t) || ans.tools_yes.includes(t)) matched.push(t);
     }
   }
-  return { score: den > 0 ? num / den : null, matched };
+  return { score: den > 0 ? num / Math.max(1, den) : null, matched };
 }
 
 /** confirmed working tools that are NOT blades: several of them contradict a "single-blade" category guess */

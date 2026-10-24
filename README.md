@@ -8,7 +8,7 @@ Foto eines Taschenmessers → passendes, aktuelles Victorinox-Modell mit Werkzeu
 npm install
 cp .env.example .env.local   # OPENAI_API_KEY eintragen
 npm run dev                  # http://localhost:3000
-npx tsx scripts/test-score.ts   # Scoring-Tests ohne API-Key
+npm test                     # Scoring-Tests ohne API-Key
 ```
 
 Die Kamera am Handy braucht HTTPS → vom Handy immer gegen die Vercel-URL testen.
@@ -50,6 +50,18 @@ pip install pillow
 python eval/run_eval.py --url https://<app>.vercel.app
 ```
 Gibt Top-1, Top-3, Latenz und Trefferquote pro Konfidenzstufe aus (für die Kalibrierung in `config/scoring.json`).
+
+Gespeicherte Erkennungen vollständig offline auswerten (kein API-Key, HTTP, Vision oder Redis):
+
+```bash
+python3 eval/run_eval.py --offline --no-sku --out eval/offline-no-sku.csv
+python3 eval/run_eval.py --offline --out eval/offline-with-sku.csv
+```
+
+`--scoring-root /absoluter/pfad` bewertet mit einem anderen Source-Snapshot (`lib`, `data`, `config` und Zugriff auf `node_modules`).
+Verglichen werden Fotos und kombinierte Messer, getrennt nach Ground-Truth-Pfad, sowie die exakte Abdeckung sicher erkannter Arbeitsfunktionen.
+`--no-sku` ist hier der primäre Vergleich, weil der Testdatensatz ein falsch beschriftetes Classic SD enthält.
+Die Zuverlässigkeit ist eine Heuristik, keine kalibrierte Wahrscheinlichkeit. Details, Gewichte, Vorher/Nachher-Zahlen und Regressionen: [Ranking-Audit](eval/ranking-audit/report.md).
 
 ## Offen für M2
 
