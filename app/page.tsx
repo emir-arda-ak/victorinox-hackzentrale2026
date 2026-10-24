@@ -73,6 +73,29 @@ const STATUS = {
   unknown: { sym: "?", cls: "text-gray-500", title: "auf dem Foto nicht sichtbar" },
 } as const;
 
+/** every agent has its own knife drawing (public/agents, by Haining); it spins while the agent works */
+const AGENTS = [
+  { name: "Orchestrator", short: "Orchestrator", icon: "/agents/knife-04.svg", role: "plant & fragt nach" },
+  { name: "Vision-Agent", short: "Vision", icon: "/agents/knife-01.svg", role: "sieht die Fotos" },
+  { name: "Product-Data-Agent", short: "Produktdaten", icon: "/agents/knife-06.svg", role: "kennt den Katalog" },
+  { name: "Recommendation-Agent", short: "Empfehlung", icon: "/agents/knife-09.svg", role: "wählt das Modell" },
+] as const;
+const ICON = Object.fromEntries(AGENTS.map((a) => [a.name, a.icon])) as Record<string, string>;
+
+function KnifeAvatar({ agent, state, size = 36 }: { agent: string; state: "run" | "done" | "skip" | "idle"; size?: number }) {
+  const url = `url(${ICON[agent] ?? AGENTS[0].icon})`;
+  const color = state === "run" ? "bg-red-700" : state === "skip" ? "bg-amber-500" : state === "done" ? "bg-gray-800" : "bg-gray-300";
+  return (
+    <span className={`relative inline-flex flex-none items-center justify-center rounded-full border bg-white ${state === "run" ? "border-red-300 shadow-sm" : "border-gray-200"}`}
+      style={{ width: size, height: size }} aria-hidden>
+      <span className={`block ${color} ${state === "run" ? "animate-[spin_1.4s_linear_infinite]" : ""}`}
+        style={{ width: size * 0.78, height: size * 0.78, WebkitMask: `${url} center / contain no-repeat`, mask: `${url} center / contain no-repeat` }} />
+      {state === "done" && size >= 40 && <span className="absolute -bottom-0.5 -right-0.5 rounded-full bg-green-600 px-[3px] text-[9px] leading-[13px] text-white">✓</span>}
+      {state === "skip" && size >= 40 && <span className="absolute -bottom-0.5 -right-0.5 rounded-full bg-amber-500 px-[4px] text-[9px] leading-[13px] text-white">!</span>}
+    </span>
+  );
+}
+
 function Chip({ on, dashed, children, onClick }: { on: boolean; dashed?: boolean; children: React.ReactNode; onClick: () => void }) {
   return (
     <button onClick={onClick}
@@ -131,6 +154,7 @@ export default function Home() {
         throw new Error(j.error ?? r.statusText);
       }
       const exs: Extraction[] = [...prevEx];
+      let gotResult = false;
       const reader = r.body.getReader();
       const dec = new TextDecoder();
       let buf = "";
@@ -149,6 +173,7 @@ export default function Home() {
           } else if (ev.type === "photo") exs[ev.index] = ev.extraction;
           else if (ev.type === "error") throw new Error(ev.error);
           else if (ev.type === "result") {
+            gotResult = true;
             setExtractions(exs);
             setAnswers(ev.result.answers);
             setRes(ev.result);
@@ -157,6 +182,7 @@ export default function Home() {
         }
         if (done) break;
       }
+      if (!gotResult) throw new Error("Verbindung zum Agenten abgebrochen. Bitte nochmals versuchen.");
     } catch (e) {
       setError(e instanceof Error ? e.message : String(e));
       if (!add) setPhotos([]);
@@ -282,13 +308,24 @@ export default function Home() {
           <summary className="cursor-pointer font-semibold">
             Agent-Schritte {busy ? "· läuft …" : `· ${steps.length} Schritte${res?.agent_checks?.length ? `, ${res.agent_checks.length} Selbstprüfung${res.agent_checks.length > 1 ? "en" : ""}` : ""}`}
           </summary>
-          <ol className="mt-2 space-y-1.5">
+          <div className="mt-3 grid grid-cols-4 gap-1 text-center">
+            {AGENTS.map((a) => {
+              const mine = steps.filter((s) => s.agent === a.name);
+              const state = mine.some((s) => s.status === "run") ? "run" : mine.length ? "done" : "idle";
+              return (
+                <div key={a.name} className="flex flex-col items-center gap-1">
+                  <KnifeAvatar agent={a.name} state={state} size={48} />
+                  <span className={`text-[11px] font-medium leading-tight ${state === "run" ? "text-red-700" : state === "idle" ? "text-gray-400" : "text-gray-800"}`}>{a.short}</span>
+                  <span className="text-[10px] leading-tight text-gray-500">{a.role}</span>
+                </div>
+              );
+            })}
+          </div>
+          <ol className="mt-3 space-y-2 border-t pt-3">
             {steps.map((s) => (
-              <li key={s.id} className="flex gap-2">
-                <span className={`mt-0.5 w-4 flex-none text-center ${s.status === "run" ? "animate-pulse text-red-700" : s.status === "skip" ? "text-amber-600" : "text-green-700"}`}>
-                  {s.status === "run" ? "●" : s.status === "skip" ? "!" : "✓"}
-                </span>
-                <span>
+              <li key={s.id} className="flex items-start gap-2">
+                <KnifeAvatar agent={s.agent} state={s.status} size={28} />
+                <span className="pt-0.5">
                   <span className="font-medium">{s.agent}</span> <span className="text-gray-700">{s.text}</span>
                   {s.ms != null && <span className="text-xs text-gray-400"> · {(s.ms / 1000).toFixed(1)} s</span>}
                 </span>
