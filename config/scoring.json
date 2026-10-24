@@ -1,5 +1,5 @@
 {
-  "_comment": "Gewichte für lib/agent/score.ts. Alexandra tunt hier, ohne TypeScript anzufassen.",
+  "_comment": "Gewichte für lib/agent/score.ts. Alexandra tunt hier, ohne TypeScript anzufassen. 'weights' ist veraltet (nur Referenz); massgebend sind 'modes'.",
   "weights": {
     "tools": 3.0,
     "length": 2.0,
@@ -10,12 +10,20 @@
     "material": 0.5,
     "color": 0.5
   },
-  "tool_visibility_weight": { "prominent": 1.0, "normal": 0.6, "hidden": 0.25 },
+  "tool_visibility_weight": {
+    "prominent": 1.0,
+    "normal": 0.6,
+    "hidden": 0.25
+  },
   "tool_seen_but_missing_penalty": 1.0,
   "tool_seen_as_subtool_credit": 0.6,
   "blade_size_swap_credit": 0.8,
   "tool_maybe_factor": 0.4,
-  "tool_unseen_penalty": { "open": 0.35, "partly": 0.15, "closed": 0.0 },
+  "tool_unseen_penalty": {
+    "open": 0.35,
+    "partly": 0.15,
+    "closed": 0.0
+  },
   "tool_answered_no_penalty": 1.5,
   "length_alt_zone_score": 0.5,
   "length_sigma_mm": 8,
@@ -32,5 +40,75 @@
     "ask_below_confidence": 0.75,
     "top_k": 5
   },
-  "excluded_categories": ["OTHER"]
+  "excluded_categories": [
+    "OTHER"
+  ],
+  "_comment_modes": "Gewichte pro Pfad. victorinox = Identifikation (bisheriges Verhalten). competitor/unknown = Ersatzempfehlung, Funktionen zuerst. Startwerte sind Hypothesen, nicht trainiert. Siehe eval/function_first_report.md.",
+  "modes": {
+    "victorinox": {
+      "tools": 3.0,
+      "functional_coverage": 0.0,
+      "handling": 0.0,
+      "length": 2.0,
+      "category": 2.5,
+      "model_name": 3.0,
+      "visible_sku": 10.0,
+      "crossref": 4.0,
+      "learned": 4.0,
+      "material": 0.5,
+      "color": 0.5,
+      "excess": 0.0,
+      "category_low_evidence": 2.5
+    },
+    "competitor": {
+      "tools": 1.5,
+      "functional_coverage": 4.0,
+      "handling": 0.75,
+      "length": 2.0,
+      "category": 1.0,
+      "model_name": 0.0,
+      "visible_sku": 10.0,
+      "crossref": 4.0,
+      "learned": 1.5,
+      "material": 0.25,
+      "color": 0.2,
+      "excess": 1.0,
+      "category_low_evidence": 2.5
+    },
+    "unknown": {
+      "tools": 2.0,
+      "functional_coverage": 3.0,
+      "handling": 0.5,
+      "length": 2.0,
+      "category": 1.5,
+      "model_name": 3.0,
+      "visible_sku": 10.0,
+      "crossref": 4.0,
+      "learned": 2.0,
+      "material": 0.4,
+      "color": 0.4,
+      "excess": 0.5,
+      "category_low_evidence": 2.5
+    }
+  },
+  "functional": {
+    "_comment": "answer_weight: vom Nutzer bestätigte Werkzeuge zählen stärker als Vision; maybe_weight: unsichere Werkzeuge. learned_gate_power: gelernte Regeln wirken nur mit cov^power (Funktionsabdeckung des Kandidaten).",
+    "answer_weight": 1.25,
+    "maybe_weight": 0.4,
+    "learned_gate_power": 2,
+    "category_soft": {
+      "SAK|ONEHAND": -0.3,
+      "ONEHAND|SAK": -0.3,
+      "SAK|MULTITOOL": -0.6,
+      "MULTITOOL|SAK": -0.6
+    },
+    "category_conflict_min_tools": 2,
+    "category_conflict_factor": 0.5,
+    "learned_only_win_max_level": "medium",
+    "blade_variant_credit": 0.6,
+    "excess_min_tools": 4,
+    "excess_slack": 1.5,
+    "excess_log_scale": 3,
+    "strong_evidence_tools": 3
+  }
 }

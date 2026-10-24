@@ -1,6 +1,7 @@
 import { CATALOG, CROSSREF, SCORING, TOOL_META, zoneFor } from "@/lib/catalog";
 import type { CatalogModel, ToolId, Visibility } from "@/lib/catalog.types";
 import type { Answers, Extraction } from "./schema";
+import { BLADE_TWIN, confirmedNonBladeWorking, excessScore, functionalCoverageScore, handlingScore, isWorking } from "./functional";
 
 export type ToolRowStatus = "both" | "only_victorinox" | "missing" | "unknown";
 export type ToolRow = { tool: ToolId; label: string; status: ToolRowStatus };
@@ -15,7 +16,19 @@ export type Candidate = {
   parts: Record<string, number>;
   tools: ToolRow[];
   source: CatalogModel["source"];
+  /** function-first diagnostics (labels only for tools that were actually observed / confirmed) */
+  functional?: {
+    coverage: number | null; // weighted recall of observed working functions, null = none observed
+    matched_working_tools: string[];
+    missing_working_tools: string[]; // confirmed on the photo / by the user, not in this model
+    matched_handling_attributes: string[];
+  };
 };
+
+/** victorinox = identify the exact own model; competitor/unknown = recommend a functional replacement */
+export type MatchMode = "victorinox" | "competitor" | "unknown";
+export const modeFor = (ex: Extraction): MatchMode =>
+  ex.is_victorinox === true ? "victorinox" : ex.is_victorinox === false ? "competitor" : "unknown";
 
 export type LearnedRule = {
   brand: string | null;
@@ -34,14 +47,12 @@ export type Ranking = {
   reasons: string[]; // why this confidence
 };
 
-const W = SCORING.weights;
 const visW = (t: ToolId) => SCORING.tool_visibility_weight[(TOOL_META[t]?.visibility ?? "normal") as Visibility];
 const norm = (s: string | null | undefined) => (s ?? "").toLowerCase().replace(/[^a-z0-9]/g, "");
 
-/** absolute blade size cannot be judged on a photo: a "large" blade may be the only (small) blade of a 58 mm knife */
-const BLADE_TWIN: Partial<Record<ToolId, ToolId>> = { blade_large: "blade_small", blade_small: "blade_large" };
-
-function toolScore(c: CatalogModel, ex: Extraction, ans: Answers) {
+/** net tool fit (recall AND penalties for unseen/answered-no tools), -1..1. workingOnly: ignore clip/thumb stud/lanyard/ring */
+function toolScore(c: CatalogModel, ex: Extraction, ans: Answers, workingOnly = false) {
+  const keep = (t: ToolId) => !workingOnly || isWorking(t);
   const main = new Set<ToolId>(c.tools);
   const sub = new Set<ToolId>(c.subtools);
   const seen = new Set<ToolId>([...ex.tools_seen, ...ans.tools_yes]);
@@ -50,7 +61,7 @@ function toolScore(c: CatalogModel, ex: Extraction, ans: Answers) {
   let sum = 0;
   let norm_ = 0;
   for (const t of seen) {
-    if (t === "other") continue;
+    if (t === "other" || !keep(t)) continue;
     const w = visW(t);
     norm_ += w;
     if (main.has(t)) sum += w;
@@ -59,11 +70,13 @@ function toolScore(c: CatalogModel, ex: Extraction, ans: Answers) {
     else sum -= w * SCORING.tool_seen_but_missing_penalty;
   }
   for (const t of maybe) {
+    if (!keep(t)) continue;
     const w = visW(t) * SCORING.tool_maybe_factor;
     norm_ += w;
     if (main.has(t) || sub.has(t)) sum += w;
   }
   for (const t of no) {
+    if (!keep(t)) continue;
     const w = visW(t);
     norm_ += w;
     if (main.has(t)) sum -= w * SCORING.tool_answered_no_penalty;
@@ -72,7 +85,7 @@ function toolScore(c: CatalogModel, ex: Extraction, ans: Answers) {
   // candidate tools that should have been visible but were not seen
   const unseenFactor = (SCORING.tool_unseen_penalty as Record<string, number>)[ex.open_state] ?? 0;
   for (const t of main) {
-    if (seen.has(t) || maybe.has(t) || no.has(t) || t === "other") continue;
+    if (seen.has(t) || maybe.has(t) || no.has(t) || t === "other" || !keep(t)) continue;
     const vis = TOOL_META[t]?.visibility;
     if (vis === "hidden") continue;
     const w = visW(t) * unseenFactor;
@@ -119,9 +132,27 @@ function lengthScore(c: CatalogModel, ex: Extraction, ans: Answers): { s: number
   return { s: 0, conf: 0 };
 }
 
-function categoryScore(c: CatalogModel, ex: Extraction) {
+function categoryScore(c: CatalogModel, ex: Extraction, mode: MatchMode = "victorinox") {
   if (ex.category === "OTHER_KNIFE") return ["SAK", "ONEHAND", "FIXED", "GARDEN"].includes(c.category) ? 0 : -0.5;
-  return c.category === ex.category ? 1 : -1;
+  if (c.category === ex.category) return 1;
+  // replacement: a neighbouring category is a soft preference, not a hard penalty that overrides confirmed tools
+  if (mode !== "victorinox") {
+    const soft = (SCORING.functional.category_soft as Record<string, number>)[`${ex.category}|${c.category}`];
+    if (soft != null) return soft;
+  }
+  return -1;
+}
+
+/** Category used for scoring + trust in it. A "one-hand knife" with e.g. scissors + corkscrew is most likely a
+ *  pocket knife: score it as SAK (MULTITOOL if pliers were seen) with reduced weight. The extraction itself is not changed. */
+function effectiveCategory(ex: Extraction, ans: Answers): { category: Extraction["category"]; trust: number } {
+  if (ans.category) return { category: ans.category, trust: 1 }; // corrected by the user
+  const single = ex.category === "ONEHAND" || ex.category === "FIXED";
+  if (single && confirmedNonBladeWorking(ex, ans) >= SCORING.functional.category_conflict_min_tools) {
+    const pliers = [...ex.tools_seen, ...ans.tools_yes].includes("pliers");
+    return { category: pliers ? "MULTITOOL" : "SAK", trust: SCORING.functional.category_conflict_factor };
+  }
+  return { category: ex.category, trust: 1 };
 }
 
 function nameScore(c: CatalogModel, ex: Extraction) {
@@ -158,22 +189,28 @@ export function ruleSimilarity(ex: Extraction, r: LearnedRule): number {
   return jac >= 0.7 ? jac * brandBonus : 0;
 }
 
-function crossrefScore(c: CatalogModel, ex: Extraction, learned: LearnedRule[]) {
+/** verified cross-reference table (data/crossref.json): exact brand + model -> Victorinox model */
+function crossrefScore(c: CatalogModel, ex: Extraction) {
+  if (!ex.brand || !ex.model_guess) return 0;
+  const b = norm(ex.brand), m = norm(ex.model_guess);
+  return CROSSREF.some((e) => norm(e.brand) === b && norm(e.model) === m && e.preferred_match === c.id) ? 1 : 0;
+}
+
+/** unvalidated user feedback ("this knife -> that model"), 0..1. NOT product data: in replacement mode it is
+ *  gated by the candidate's functional coverage, so it cannot override a large confirmed-function mismatch. */
+function learnedScore(c: CatalogModel, ex: Extraction, learned: LearnedRule[], coverage: number | null, mode: MatchMode) {
   let s = 0;
-  if (ex.brand && ex.model_guess) {
-    const b = norm(ex.brand), m = norm(ex.model_guess);
-    for (const e of CROSSREF) if (norm(e.brand) === b && norm(e.model) === m && e.preferred_match === c.id) s = Math.max(s, 1);
-  }
   for (const r of learned) {
     if (r.victorinox_id !== c.id) continue;
     s = Math.max(s, ruleSimilarity(ex, r) * Math.min(1, 0.6 + 0.2 * r.count));
   }
-  return s;
+  if (mode === "victorinox" || coverage == null) return s;
+  return s * Math.pow(coverage, SCORING.functional.learned_gate_power);
 }
 
 function materialScore(c: CatalogModel, ex: Extraction) {
   const cm = c.scale_material ?? (c.category === "SAK" ? "Cellidor" : null);
-  if (!ex.scale_material || !cm) return 0;
+  if (!ex.scale_material || ex.scale_material === "Andere" || !cm) return 0;
   return cm.toLowerCase().startsWith(ex.scale_material.toLowerCase()) ? 1 : 0;
 }
 
@@ -213,38 +250,67 @@ function toolRows(c: CatalogModel, ex: Extraction, ans: Answers): ToolRow[] {
 
 export function score(ex: Extraction, ans: Answers, learned: LearnedRule[] = []): Ranking {
   const excluded = new Set<string>(SCORING.excluded_categories);
+  const mode = modeFor(ex);
+  const M = (SCORING.modes as Record<MatchMode, Record<string, number>>)[mode];
+  const eff = effectiveCategory(ex, ans);
+  const catTrust = eff.trust;
+  const exCat: Extraction = eff.category === ex.category ? ex : { ...ex, category: eff.category };
+  // category counts fully only while there is little functional evidence (0–1 tools on one photo);
+  // with several confirmed working functions it shrinks to the mode's base weight
+  const no = new Set(ans.tools_no);
+  const confirmedWorking = new Set([...ex.tools_seen, ...ans.tools_yes].filter((t) => isWorking(t) && !no.has(t))).size;
+  const strength = Math.min(1, confirmedWorking / SCORING.functional.strong_evidence_tools);
+  const catW = M.category_low_evidence + (M.category - M.category_low_evidence) * strength;
   const scored = CATALOG.filter((c) => !excluded.has(c.category)).map((c) => {
     const len = lengthScore(c, ex, ans);
+    const fc = functionalCoverageScore(c, ex, ans);
+    const hd = handlingScore(c, ex, ans);
     const parts: Record<string, number> = {
-      tools: W.tools * toolScore(c, ex, ans),
-      length: W.length * len.s * (0.4 + 0.6 * len.conf),
-      category: W.category * categoryScore(c, ex) * ex.category_confidence,
-      model_name: W.model_name * nameScore(c, ex),
-      visible_sku: W.visible_sku * skuScore(c, ex),
-      crossref: W.crossref * crossrefScore(c, ex, learned),
-      material: W.material * materialScore(c, ex),
-      color: (W as Record<string, number>).color * colorScore(c, ex),
+      // victorinox mode: old net tool fit incl. handling; replacement modes: working functions only
+      tools: M.tools * toolScore(c, ex, ans, mode !== "victorinox"),
+      // recall of observed working functions mapped to -1..1 (0 = half covered); unknown -> neutral 0
+      functional_coverage: M.functional_coverage * (fc.coverage == null ? 0 : 2 * fc.coverage - 1),
+      handling: M.handling * (hd.score ?? 0),
+      excess: M.excess * excessScore(c, ex, ans),
+      length: M.length * len.s * (0.4 + 0.6 * len.conf),
+      category: catW * categoryScore(c, exCat, mode) * ex.category_confidence * catTrust,
+      model_name: M.model_name * nameScore(c, ex),
+      visible_sku: M.visible_sku * skuScore(c, ex),
+      crossref: M.crossref * crossrefScore(c, ex),
+      learned: M.learned * learnedScore(c, ex, learned, fc.coverage, mode),
+      material: M.material * materialScore(c, ex),
+      color: M.color * colorScore(c, ex),
     };
+    for (const k of Object.keys(parts)) if (!Number.isFinite(parts[k])) parts[k] = 0;
     const total = Object.values(parts).reduce((a, b) => a + b, 0);
-    return { c, total, parts };
+    return { c, total, parts, fc, hd };
   });
-  // ties: prefer the standard model (more variants = core model, special editions have few)
-  scored.sort((a, b) => b.total - a.total || b.c.variants.length - a.c.variants.length);
+  // ties: prefer the standard model (more variants = core model, special editions have few), then stable by id
+  scored.sort((a, b) => b.total - a.total || b.c.variants.length - a.c.variants.length || a.c.id.localeCompare(b.c.id));
 
   const top = scored.slice(0, 10);
   // functional twins (same tools, same length, e.g. Swiss Tool vs. Swiss Tool BS) are not real competitors for confidence
   const sig = (c: CatalogModel) => `${c.category}|${c.length_mm}|${[...c.tools].sort().join(",")}`;
   const rival = top.slice(1).find((x) => sig(x.c) !== sig(top[0].c));
   const margin = top[0] ? top[0].total - (rival?.total ?? 0) : 0;
-  const maxPossible = W.tools + W.length + W.category;
-  const fit = Math.max(0, Math.min(1, (top[0]?.total ?? 0) / maxPossible));
+  // HEURISTIC reliability score (0..1), not a calibrated probability. Learned feedback does not count as fit.
+  const maxPossible = M.tools + M.functional_coverage + M.handling + M.length + catW;
+  const fit = Math.max(0, Math.min(1, ((top[0]?.total ?? 0) - (top[0]?.parts.learned ?? 0)) / maxPossible));
   const sep = 1 - Math.exp(-SCORING.confidence.margin_scale * Math.max(0, margin));
   let confidence = (0.5 * fit + 0.5 * sep) * (0.4 + 0.6 * evidence(ex, ans));
   if (top[0]) {
-    const missing = toolRows(top[0].c, ex, ans).filter((r) => r.status === "missing").length;
+    const missing = mode === "victorinox"
+      ? toolRows(top[0].c, ex, ans).filter((r) => r.status === "missing").length
+      : top[0].fc.missing.length;
     confidence *= Math.max(0.3, 1 - SCORING.confidence.missing_tool_factor * missing);
+    // a top spot that only exists thanks to unvalidated feedback must not be reported as "high"
+    if (top[0].parts.learned > 0 && rival && top[0].total - top[0].parts.learned <= rival.total)
+      confidence = Math.min(confidence, SCORING.confidence.high - 0.01);
   }
-  if (top[0] && top[0].parts.visible_sku >= W.visible_sku) confidence = Math.max(confidence, 0.95);
+  // contradictory extraction (category vs. tools): never "high"
+  if (catTrust < 1) confidence = Math.min(confidence, SCORING.confidence.high - 0.01);
+  if (top[0] && top[0].parts.visible_sku >= M.visible_sku) confidence = Math.max(confidence, 0.95);
+  confidence = Number.isFinite(confidence) ? Math.max(0, Math.min(1, confidence)) : 0;
 
   const reasons: string[] = [];
   const zoneUsed = ans.length_zone ?? ex.length_zone;
@@ -253,12 +319,14 @@ export function score(ex: Extraction, ans: Answers, learned: LearnedRule[] = [])
   if (ex.open_state !== "open") reasons.push("Werkzeuge teilweise verdeckt");
   if (ex.image_issues.length) reasons.push(`Bild: ${ex.image_issues.join(", ")}`);
   if (margin < 0.3) reasons.push("Mehrere Modelle fast gleich passend");
+  if (catTrust < 1) reasons.push(`Kategorie widerspricht den erkannten Werkzeugen – bewertet als ${eff.category === "SAK" ? "Taschenmesser" : "Multitool"}`);
+  if (mode !== "victorinox") reasons.push("Ersatz nach Funktionen gewählt");
   const twins = top.slice(1).filter((x) => top[0] && sig(x.c) === sig(top[0].c)).length;
   if (twins) reasons.push(`${twins} funktional gleiche Variante${twins > 1 ? "n" : ""} (z. B. andere Farbe/Schale)`);
 
   const level = confidence >= SCORING.confidence.high ? "high" : confidence >= SCORING.confidence.medium ? "medium" : "low";
   return {
-    candidates: top.map(({ c, total, parts }) => ({
+    candidates: top.map(({ c, total, parts, fc, hd }) => ({
       id: c.id,
       name: c.name,
       category: c.category,
@@ -268,6 +336,12 @@ export function score(ex: Extraction, ans: Answers, learned: LearnedRule[] = [])
       parts: Object.fromEntries(Object.entries(parts).map(([k, v]) => [k, Math.round(v * 100) / 100])),
       tools: toolRows(c, ex, ans),
       source: c.source,
+      functional: {
+        coverage: fc.coverage == null ? null : Math.round(fc.coverage * 100) / 100,
+        matched_working_tools: fc.matched.map((t) => TOOL_META[t].label),
+        missing_working_tools: fc.missing.map((t) => TOOL_META[t].label),
+        matched_handling_attributes: hd.matched.map((t) => TOOL_META[t].label),
+      },
     })),
     confidence: Math.round(confidence * 100) / 100,
     level,

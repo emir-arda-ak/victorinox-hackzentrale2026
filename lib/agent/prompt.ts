@@ -29,7 +29,7 @@ const toolList = Object.entries(TOOL_META)
   .map(([id, m]) => `- ${id}: ${m.label}${HINTS[id] ? ` — ${HINTS[id]}` : ""}`)
   .join("\n");
 
-export const PROMPT_VERSION = "v4-2026-10-24-1030";
+export const PROMPT_VERSION = "v5-2026-10-24-1140";
 
 export const EXTRACTION_PROMPT = `You analyse a photo of a pocket knife or multitool for a Victorinox product-matching tool used by sales staff.
 Return ONLY facts you can see. Never guess specifications.
@@ -37,6 +37,7 @@ Return ONLY facts you can see. Never guess specifications.
 1. Category – judge the WHOLE object, not the opened tool:
    - SAK: classic multi-tool pocket knife with several tools folded into the handle (thick handle with several layers). It stays SAK even if only one blade or tool is opened on the photo.
    - ONEHAND: single-blade folding knife with one-hand opening (thumb stud/hole) or pocket clip and NO other tools in the handle.
+   - A clip or thumb stud alone does NOT make it ONEHAND: if you also see scissors, a corkscrew, openers or several tools in the handle, it is SAK.
    - MULTITOOL: plier-based tool. SWISSCARD: credit-card tool. FIXED: fixed blade. GARDEN: garden/pruning knife. OTHER_KNIFE / NOT_A_KNIFE.
 
 2. Brand – be strict:
