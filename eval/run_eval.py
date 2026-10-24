@@ -83,7 +83,7 @@ def merge(exs: list[dict]) -> dict:
         "brand": mode("brand"), "brand_evidence": mode("brand_evidence"),
         "is_victorinox": (sum(vic) > len(vic) / 2) if vic else None,
         "model_guess": mode("model_guess"), "visible_sku": mode("visible_sku"),
-        "open_state": "open" if "open" in states else ("partly" if "partly" in states else "closed"),
+        "open_state": "open" if any(e.get("open_state") == "open" and len(e.get("tools_seen", [])) >= 3 for e in exs) else ("partly" if states & {"open", "partly"} else "closed"),
         "tools_seen": seen, "tools_maybe": maybe,
         "sheet_visible": any(e.get("sheet_visible") for e in exs),
         "length_zone": best_len.get("length_zone"), "length_zone_alt": best_len.get("length_zone_alt"),

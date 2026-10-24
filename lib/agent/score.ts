@@ -17,7 +17,15 @@ export type Candidate = {
   source: CatalogModel["source"];
 };
 
-export type LearnedRule = { brand: string; model: string; victorinox_id: string; count: number };
+export type LearnedRule = {
+  brand: string | null;
+  model: string | null;
+  category: string;
+  zone: string | null;
+  tools: string[];
+  victorinox_id: string;
+  count: number;
+};
 
 export type Ranking = {
   candidates: Candidate[]; // sorted, best first (top 10)
@@ -134,15 +142,32 @@ function skuScore(c: CatalogModel, ex: Extraction) {
   return s.startsWith(c.id.toUpperCase()) || c.id.toUpperCase().startsWith(s) ? 0.5 : 0;
 }
 
+/** how similar a new extraction is to the one a learned rule was made from (0..1) */
+export function ruleSimilarity(ex: Extraction, r: LearnedRule): number {
+  if (r.category !== ex.category) return 0;
+  const b1 = norm(ex.brand), b2 = norm(r.brand);
+  if (b1 && b2 && b1 !== b2) return 0;
+  if (norm(ex.model_guess) && norm(r.model) && norm(ex.model_guess) === norm(r.model)) return 1;
+  const a = new Set<string>(ex.tools_seen), t = new Set<string>(r.tools);
+  const inter = [...a].filter((x) => t.has(x)).length;
+  const union = new Set([...a, ...t]).size;
+  const jac = union ? inter / union : 0;
+  // strict on purpose: a rule must not leak onto other knives with a similar tool set
+  if (ex.length_zone && r.zone && ex.length_zone !== r.zone) return 0;
+  const brandBonus = b1 && b1 === b2 ? 1 : 0.8;
+  return jac >= 0.7 ? jac * brandBonus : 0;
+}
+
 function crossrefScore(c: CatalogModel, ex: Extraction, learned: LearnedRule[]) {
-  if (!ex.brand || !ex.model_guess) return 0;
-  const b = norm(ex.brand);
-  const m = norm(ex.model_guess);
   let s = 0;
-  for (const e of CROSSREF)
-    if (norm(e.brand) === b && norm(e.model) === m && e.preferred_match === c.id) s = Math.max(s, 1);
-  for (const r of learned)
-    if (norm(r.brand) === b && norm(r.model) === m && r.victorinox_id === c.id) s = Math.max(s, Math.min(1, 0.5 + 0.25 * r.count));
+  if (ex.brand && ex.model_guess) {
+    const b = norm(ex.brand), m = norm(ex.model_guess);
+    for (const e of CROSSREF) if (norm(e.brand) === b && norm(e.model) === m && e.preferred_match === c.id) s = Math.max(s, 1);
+  }
+  for (const r of learned) {
+    if (r.victorinox_id !== c.id) continue;
+    s = Math.max(s, ruleSimilarity(ex, r) * Math.min(1, 0.6 + 0.2 * r.count));
+  }
   return s;
 }
 

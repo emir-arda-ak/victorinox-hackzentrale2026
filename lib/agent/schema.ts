@@ -34,6 +34,7 @@ export const AnswersSchema = z.object({
   tools_yes: z.array(z.enum(TOOL_IDS)).default([]),
   tools_no: z.array(z.enum(TOOL_IDS)).default([]),
   length_zone: ZONE.nullable().default(null),
+  category: z.enum(["SAK", "MULTITOOL", "ONEHAND", "SWISSCARD", "FIXED", "GARDEN", "OTHER_KNIFE"]).nullable().default(null),
   rounds: z.number().default(0),
 });
 export type Answers = z.infer<typeof AnswersSchema>;

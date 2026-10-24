@@ -14,7 +14,9 @@ export type MatchResult = {
 };
 
 /** Router + scoring + follow-up question. Used by /api/match (after extraction) and /api/score (re-rank). */
-export function decide(ex: Extraction, ans: Answers, learned: LearnedRule[] = [], timings: Record<string, number> = {}): MatchResult {
+export function decide(ex0: Extraction, ans: Answers, learned: LearnedRule[] = [], timings: Record<string, number> = {}): MatchResult {
+  // corrections from the UI chips override what the vision model saw
+  const ex: Extraction = ans.category ? { ...ex0, category: ans.category, category_confidence: 1 } : ex0;
   if (ex.category === "NOT_A_KNIFE") {
     return { status: "rejected", path: null, extraction: ex, ranking: null, question: null, timings };
   }

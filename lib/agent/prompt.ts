@@ -4,6 +4,8 @@ import { TOOL_META } from "@/lib/catalog";
 const HINTS: Record<string, string> = {
   blade_large: "main cutting blade, long, one sharp edge",
   blade_small: "second, clearly shorter cutting blade",
+  blade_gutting: "short CURVED blade with a blunt, rounded/upturned tip (gutting blade, typical on 130 mm Ranger knives)",
+  bits: "bit holder or hex socket for interchangeable screwdriver bits",
   awl: "thin pointed spike (round or triangular, often with a sewing eye) WITHOUT a cutting edge – not a blade",
   corkscrew: "metal spiral",
   can_opener: "short hooked tool with a sharp curved point and a small flat screwdriver tip",
@@ -27,7 +29,7 @@ const toolList = Object.entries(TOOL_META)
   .map(([id, m]) => `- ${id}: ${m.label}${HINTS[id] ? ` — ${HINTS[id]}` : ""}`)
   .join("\n");
 
-export const PROMPT_VERSION = "v3-2026-10-24-0935";
+export const PROMPT_VERSION = "v4-2026-10-24-1030";
 
 export const EXTRACTION_PROMPT = `You analyse a photo of a pocket knife or multitool for a Victorinox product-matching tool used by sales staff.
 Return ONLY facts you can see. Never guess specifications.
