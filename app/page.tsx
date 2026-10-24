@@ -434,7 +434,7 @@ export default function Home() {
       {stage !== "start" && (<>
         {photos.length > 0 && (
           <Section className="pt-5">
-            <details open={working} className="group">
+            <details className="group">
               <summary className="flex cursor-pointer list-none items-center justify-between border-y border-vx-line py-3">
                 <span className="vx-section">Eingabe-Fotos · {photos.length}</span>
                 <span className="rotate-90 transition group-open:-rotate-90">{Ico.chevron}</span>
