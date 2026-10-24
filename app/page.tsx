@@ -53,6 +53,33 @@ async function resize(file: File, max = 1280): Promise<string> {
   return c.toDataURL("image/jpeg", 0.85);
 }
 
+/** quick client-side photo check (no API call): exposure + sharpness on a 256 px grey copy */
+type Quality = { sharp: boolean; exposure: "ok" | "dark" | "bright" };
+async function checkQuality(src: string): Promise<Quality> {
+  const img = new Image();
+  img.src = src;
+  await img.decode();
+  const s = 256 / Math.max(img.naturalWidth, img.naturalHeight);
+  const w = Math.max(8, Math.round(img.naturalWidth * s)), h = Math.max(8, Math.round(img.naturalHeight * s));
+  const c = document.createElement("canvas");
+  c.width = w; c.height = h;
+  const ctx = c.getContext("2d")!;
+  ctx.drawImage(img, 0, 0, w, h);
+  const d = ctx.getImageData(0, 0, w, h).data;
+  const g = new Float32Array(w * h);
+  let sum = 0;
+  for (let i = 0; i < w * h; i++) { g[i] = 0.299 * d[i * 4] + 0.587 * d[i * 4 + 1] + 0.114 * d[i * 4 + 2]; sum += g[i]; }
+  const mean = sum / (w * h);
+  let n = 0, m = 0, m2 = 0;
+  for (let y = 1; y < h - 1; y++) for (let x = 1; x < w - 1; x++) {
+    const i = y * w + x;
+    const lap = g[i - w] + g[i + w] + g[i - 1] + g[i + 1] - 4 * g[i];
+    n++; m += lap; m2 += lap * lap;
+  }
+  const variance = m2 / n - (m / n) ** 2;
+  return { sharp: variance > 40, exposure: mean < 55 ? "dark" : mean > 230 ? "bright" : "ok" };
+}
+
 async function postJson<T>(url: string, body: unknown): Promise<T> {
   const r = await fetch(url, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) });
   const j = await r.json();
@@ -136,25 +163,55 @@ export default function Home() {
   const [q, setQ] = useState("");
   const [hits, setHits] = useState<CatItem[]>([]);
   const [steps, setSteps] = useState<StepEvent[]>([]);
+  // "Foto prüfen": photos chosen but not yet analysed
+  const [pending, setPending] = useState<{ src: string; q: Quality }[]>([]);
+  const [pendingAdd, setPendingAdd] = useState(false);
+  const [sel, setSel] = useState(0);
 
   function reset() {
     setPhotos([]); setExtractions([]); setRes(null); setAnswers(EMPTY); setError(null); setFb("idle"); setFbMsg(null); setAddTool(false); setSteps([]);
+    setPending([]); setSel(0);
   }
 
   /** one or several photos; added to the current knife (add=true) or starting a new one */
-  async function onFiles(list: FileList | File[] | null | undefined, add: boolean) {
+  /** step 1: photos chosen -> "Foto prüfen" (preview + quality check), nothing is sent yet */
+  async function onFiles(list: FileList | File[] | null | undefined, addArg: boolean) {
     const files = [...(list ?? [])].filter((f) => f.type.startsWith("image/") || /\.(heic|heif)$/i.test(f.name));
+    if (camRef.current) camRef.current.value = "";
+    if (galleryRef.current) galleryRef.current.value = "";
     if (!files.length) return;
+    setError(null);
+    const inReview = pending.length > 0;
+    const add = inReview ? pendingAdd : addArg;
+    const room = MAX_PHOTOS - (add ? photos.length : 0) - (inReview ? pending.length : 0);
+    if (room <= 0) return setError(`Maximal ${MAX_PHOTOS} Fotos pro Messer. Für ein anderes Messer „Neues Messer" wählen.`);
+    setBusy("Foto wird vorbereitet …");
+    try {
+      const imgs = await Promise.all(files.slice(0, room).map((f) => resize(f)));
+      const qs = await Promise.all(imgs.map((src) => checkQuality(src).catch((): Quality => ({ sharp: true, exposure: "ok" }))));
+      const next = [...(inReview ? pending : []), ...imgs.map((src, i) => ({ src, q: qs[i] }))];
+      setPending(next);
+      setPendingAdd(add);
+      setSel(next.length - imgs.length);
+    } catch (e) {
+      setError(e instanceof Error ? e.message : String(e));
+    } finally {
+      setBusy(null);
+    }
+  }
+
+  /** step 2: "Analysieren" -> agent run with all pending photos */
+  async function analyze() {
+    if (!pending.length) return;
+    const add = pendingAdd;
+    const imgs = pending.map((p) => p.src);
     setError(null);
     const prevPhotos = add ? photos : [];
     const prevEx = add ? extractions : [];
-    const room = MAX_PHOTOS - prevPhotos.length;
-    if (room <= 0) return setError(`Maximal ${MAX_PHOTOS} Fotos pro Messer. Für ein anderes Messer „Neues Messer" wählen.`);
     if (!add) reset();
-    const use = files.slice(0, room);
-    setBusy(use.length > 1 ? `${use.length} Fotos werden vorbereitet …` : "Foto wird vorbereitet …");
+    setPending([]);
+    setBusy("Agent arbeitet …");
     try {
-      const imgs = await Promise.all(use.map((f) => resize(f)));
       const all = [...prevPhotos, ...imgs];
       setPhotos(all);
       setSteps([]);
@@ -258,7 +315,9 @@ export default function Home() {
   const isVic = ex?.is_victorinox;
   const hasKnife = extractions.length > 0 || photos.length > 0;
   const working = !!busy;
-  const stage: "start" | "analyse" | "result" = !hasKnife && !working ? "start" : working && !res ? "analyse" : "result";
+  const stage: "start" | "review" | "analyse" | "result" =
+    pending.length > 0 && !working ? "review" : !hasKnife && !working ? "start" : working && !res ? "analyse" : "result";
+  const cur = pending[Math.min(sel, pending.length - 1)];
   const doneSteps = steps.filter((s) => s.status !== "run").length;
   const progress = steps.length ? Math.min(0.95, doneSteps / Math.max(steps.length + 2, 8)) : 0.08;
   const best = top[0];
@@ -275,8 +334,8 @@ export default function Home() {
         <img src="/brand/victorinox-logo.png" alt="Victorinox" width={148} height={30} className="h-[30px] w-auto" />
         {stage !== "start" && (
           <div className="flex items-center gap-3">
-            <span className="font-cond text-[18px] font-semibold uppercase tracking-[0.06em]">{stage === "analyse" ? "Analyse" : "Ergebnis"}</span>
-            <button onClick={reset} disabled={working} aria-label="Neues Messer" className="flex size-10 items-center justify-center disabled:opacity-40">{Ico.close}</button>
+            <span className="font-cond text-[18px] font-semibold uppercase tracking-[0.06em]">{stage === "review" ? "Foto prüfen" : stage === "analyse" ? "Analyse" : "Ergebnis"}</span>
+            <button onClick={() => (stage === "review" ? setPending([]) : reset())} disabled={working} aria-label={stage === "review" ? "Abbrechen" : "Neues Messer"} className="flex size-10 items-center justify-center disabled:opacity-40">{Ico.close}</button>
           </div>
         )}
       </header>
@@ -316,6 +375,61 @@ export default function Home() {
         </Section>
       </>)}
 
+      {/* ---------- Foto prüfen (Figma 04) ---------- */}
+      {stage === "review" && cur && (<>
+        <Section>
+          <div className="flex h-[330px] items-center justify-center overflow-hidden border border-vx-border bg-[#f7f7f5]">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src={cur.src} alt="Ausgewähltes Foto" className="size-full object-cover" />
+          </div>
+          <div className="mt-3 flex gap-2.5 overflow-x-auto pt-2">
+            {pending.map((p, i) => (
+              <div key={i} className="relative flex-none">
+                <button onClick={() => setSel(i)} aria-label={`Foto ${i + 1} anzeigen`}
+                  className={`flex size-[84px] items-center justify-center bg-vx-panel ${i === sel ? "border-2 border-vx-red" : "border border-vx-border"}`}>
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img src={p.src} alt="" className="size-[76px] object-cover" />
+                </button>
+                <button aria-label={`Foto ${i + 1} entfernen`} onClick={() => { setPending(pending.filter((_, k) => k !== i)); setSel(Math.max(0, Math.min(sel, pending.length - 2))); }}
+                  className="absolute -right-1.5 -top-1.5 flex size-[18px] items-center justify-center rounded-full border border-[#464646] bg-white text-[11px] leading-none">✕</button>
+              </div>
+            ))}
+            {pending.length + (pendingAdd ? photos.length : 0) < MAX_PHOTOS && ["Rückseite", "Logo / Nr."].map((label) => (
+              <button key={label} onClick={() => galleryRef.current?.click()}
+                className="flex size-[84px] flex-none flex-col items-center justify-center gap-1 border border-dashed border-[#bbb] bg-white text-vx-muted">
+                <span className="text-[22px] leading-none">＋</span><span className="text-[12px]">{label}</span>
+              </button>
+            ))}
+          </div>
+        </Section>
+        <Section>
+          <p className="vx-section">Bildqualität{pending.length > 1 ? ` · Foto ${sel + 1}` : ""}</p>
+          <ul className="mt-3">
+            {[
+              { ok: cur.q.sharp, auto: true, text: cur.q.sharp ? "Bild scharf" : "Bild wirkt unscharf – besser neu aufnehmen" },
+              { ok: cur.q.exposure === "ok", auto: true, text: cur.q.exposure === "ok" ? "Gut belichtet" : cur.q.exposure === "dark" ? "Bild ist zu dunkel" : "Bild ist überbelichtet" },
+              { ok: null, auto: false, text: "Messunterlage mit rotem Startbalken im Bild – Länge messbar" },
+              { ok: null, auto: false, text: "Werkzeuge aufgeklappt und sichtbar" },
+              { ok: null, auto: false, text: "Logo / Artikelnummer optional – erhöht die Trefferquote" },
+            ].map((it) => (
+              <li key={it.text} className="flex items-center gap-3 py-[9px]">
+                <span className={`flex size-6 flex-none items-center justify-center rounded-full text-[13px] ${it.ok === true ? "bg-vx-green text-white" : it.ok === false ? "bg-[#d4a017] text-white" : "bg-[#ededed] text-vx-muted"}`}>
+                  {it.ok === true ? "✓" : it.ok === false ? "!" : "–"}
+                </span>
+                <span className={`text-[16px] ${it.auto ? "text-vx-ink" : "text-vx-muted"}`}>{it.text}</span>
+              </li>
+            ))}
+          </ul>
+          <p className="mt-1 text-[13px] text-vx-muted">Schärfe und Belichtung prüft die App direkt; die übrigen Punkte bitte selbst kontrollieren.</p>
+        </Section>
+        <Section className="flex flex-col gap-3">
+          <button onClick={analyze} className="vx-btn vx-btn-primary">Analysieren{pending.length > 1 ? ` (${pending.length} Fotos)` : ""}</button>
+          <button onClick={() => { setPending([]); camRef.current?.click(); }} className="vx-btn vx-btn-outline">{Ico.camera} Neu aufnehmen</button>
+        </Section>
+        {error && <Section><p className="border-l-[3px] border-vx-red bg-vx-panel p-3 text-[15px]">{error}</p></Section>}
+      </>)}
+
+      {stage !== "review" && (<>
       {/* ---------- photos + agent ---------- */}
       {stage !== "start" && (<>
         {photos.length > 0 && (
@@ -634,6 +748,7 @@ export default function Home() {
           </details>
         </Section>
       )}
+      </>)}
     </main>
   );
 }
