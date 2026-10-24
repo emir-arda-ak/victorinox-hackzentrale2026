@@ -358,7 +358,7 @@ export default function Home() {
       {stage === "start" && (<>
         <div className="flex h-[200px] items-center justify-center bg-[#f7f7f7]">
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src="/brand/hero-knife.png" alt="Taschenmesser auf Massstab" width={305} height={200} className="h-full w-auto" />
+          <img src="/brand/hero-knife.png" alt="Taschenmesser auf Massstab" width={1869} height={730} className="h-auto w-[calc(100%-40px)] max-w-[400px]" />
         </div>
         <Section>
           <p className="vx-eyebrow">Product Match Agent</p>
