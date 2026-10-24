@@ -723,7 +723,7 @@ export default function Home() {
                   {pct(view.functional.coverage)} Funktionen abgedeckt
                 </span>
               )}
-              <span className="absolute right-3 top-3 flex items-center gap-1.5 bg-white px-[9px] py-[5px] text-[13px] font-semibold">
+              <span className="absolute right-3 top-3 flex items-center gap-1.5 border border-vx-border bg-white px-[9px] py-[4px] text-[13px] font-semibold">
                 <span className="size-2 rounded-full bg-vx-green" /> Katalog 2026
               </span>
             </div>
