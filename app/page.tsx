@@ -276,7 +276,7 @@ export default function Home() {
       {/* header */}
       <header className="sticky top-0 z-10 flex h-14 items-center justify-between border-b border-vx-line bg-white pl-4 pr-3">
         {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src="/brand/victorinox-logo.png" alt="Victorinox" width={158} height={30} className="h-[30px] w-auto" />
+        <img src="/brand/victorinox-logo.png" alt="Victorinox" width={148} height={30} className="h-[30px] w-auto" />
         {stage !== "start" && (
           <div className="flex items-center gap-3">
             <span className="font-cond text-[18px] font-semibold uppercase tracking-[0.06em]">{stage === "analyse" ? "Analyse" : "Ergebnis"}</span>
