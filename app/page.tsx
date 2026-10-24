@@ -348,7 +348,7 @@ export default function Home() {
         <img src="/brand/victorinox-logo.png" alt="Victorinox" width={148} height={30} className="h-[30px] w-auto" />
         {stage !== "start" && (
           <div className="flex items-center gap-3">
-            <span className="font-cond text-[18px] font-semibold uppercase tracking-[0.06em]">{stage === "review" ? "Foto prüfen" : stage === "analyse" ? "Analyse" : "Ergebnis"}</span>
+            <span className="font-cond text-[18px] font-semibold uppercase tracking-[0.06em]">{stage === "review" ? "" : stage === "analyse" ? "Analyse" : "Ergebnis"}</span>
             <button onClick={() => (stage === "review" ? setPending([]) : reset())} disabled={working} aria-label={stage === "review" ? "Abbrechen" : "Neues Messer"} className="flex size-10 items-center justify-center disabled:opacity-40">{Ico.close}</button>
           </div>
         )}
@@ -392,6 +392,13 @@ export default function Home() {
       {/* ---------- Foto prüfen (Figma 04) ---------- */}
       {stage === "review" && cur && (<>
         <Section>
+          <p className="vx-eyebrow">Vor der Analyse</p>
+          <h1 className="vx-h1 mt-1.5 text-[34px] leading-[36px]">Foto prüfen</h1>
+          <p className="mt-2 text-[16px] font-light leading-[23px] text-vx-text">
+            {pending.length > 1 ? `${pending.length} Fotos ausgewählt.` : "1 Foto ausgewählt."} Weitere Ansichten erhöhen die Trefferquote.
+          </p>
+        </Section>
+        <Section className="pt-5">
           <div className="flex h-[330px] items-center justify-center overflow-hidden border border-vx-border bg-[#f7f7f5]">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img src={cur.src} alt="Ausgewähltes Foto" className="size-full object-cover" />
