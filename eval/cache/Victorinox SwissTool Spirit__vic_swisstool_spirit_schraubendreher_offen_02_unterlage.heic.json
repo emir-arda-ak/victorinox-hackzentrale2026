@@ -1,0 +1,26 @@
+{
+ "category": "SAK",
+ "category_confidence": 0.67,
+ "brand": "Victorinox",
+ "brand_evidence": "Der Schriftzug VICTORINOX ist auf dem oberen Metallgriff sichtbar.",
+ "is_victorinox": true,
+ "model_guess": null,
+ "visible_sku": null,
+ "open_state": "partly",
+ "tools_seen": [],
+ "tools_maybe": [
+  "other"
+ ],
+ "sheet_visible": true,
+ "length_zone": "111",
+ "length_zone_alt": null,
+ "length_zone_confidence": 0.62,
+ "length_estimate_mm": 116,
+ "scale_color": "schwarz",
+ "scale_material": "Metall",
+ "description": "Auf der Messunterlage liegen zwei dunkle Metallgriffe mit sichtbarem VICTORINOX-Schriftzug; am oberen Griff steht ein Werkzeug seitlich heraus. Die genaue Werkzeugart ist nicht klar erkennbar.",
+ "image_issues": [
+  "multiple_objects",
+  "angled"
+ ]
+}

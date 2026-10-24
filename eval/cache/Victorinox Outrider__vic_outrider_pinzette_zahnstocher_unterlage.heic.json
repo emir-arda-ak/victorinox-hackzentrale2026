@@ -1,0 +1,25 @@
+{
+ "category": "SAK",
+ "category_confidence": 0.99,
+ "brand": "Victorinox",
+ "brand_evidence": "Weisses Kreuz innerhalb eines Schildumrisses auf dem roten Griff",
+ "is_victorinox": true,
+ "model_guess": null,
+ "visible_sku": null,
+ "open_state": "closed",
+ "tools_seen": [
+  "tweezers",
+  "toothpick",
+  "key_ring"
+ ],
+ "tools_maybe": [],
+ "sheet_visible": true,
+ "length_zone": "130",
+ "length_zone_alt": null,
+ "length_zone_confidence": 0.76,
+ "length_estimate_mm": 123,
+ "scale_color": "rot",
+ "scale_material": "Cellidor",
+ "description": "Rotes Victorinox-Taschenmesser mit mehreren Lagen; die Werkzeuge sind eingeklappt. Eine Pinzette, ein Zahnstocher und ein Ring sind sichtbar.",
+ "image_issues": []
+}

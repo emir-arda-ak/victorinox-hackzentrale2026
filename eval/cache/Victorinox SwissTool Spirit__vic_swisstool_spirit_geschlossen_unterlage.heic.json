@@ -1,0 +1,24 @@
+{
+ "category": "SAK",
+ "category_confidence": 0.64,
+ "brand": "Victorinox",
+ "brand_evidence": "Der Schriftzug VICTORINOX ist auf dem oberen Metallgriff zu erkennen.",
+ "is_victorinox": true,
+ "model_guess": null,
+ "visible_sku": null,
+ "open_state": "closed",
+ "tools_seen": [],
+ "tools_maybe": [],
+ "sheet_visible": true,
+ "length_zone": "130",
+ "length_zone_alt": null,
+ "length_zone_confidence": 0.73,
+ "length_estimate_mm": 116,
+ "scale_color": "silber",
+ "scale_material": "Metall",
+ "description": "Zu sehen sind zwei geschlossene, silberfarbene Victorinox-Messer mit Metallgriffen. Ausgeklappte Werkzeuge sind nicht sichtbar.",
+ "image_issues": [
+  "multiple_objects",
+  "angled"
+ ]
+}

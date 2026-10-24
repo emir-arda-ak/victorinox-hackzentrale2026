@@ -1,0 +1,25 @@
+{
+ "category": "OTHER_KNIFE",
+ "category_confidence": 0.56,
+ "brand": null,
+ "brand_evidence": null,
+ "is_victorinox": null,
+ "model_guess": null,
+ "visible_sku": null,
+ "open_state": "partly",
+ "tools_seen": [
+  "blade_large"
+ ],
+ "tools_maybe": [],
+ "sheet_visible": true,
+ "length_zone": "91/93",
+ "length_zone_alt": null,
+ "length_zone_confidence": 0.82,
+ "length_estimate_mm": 92,
+ "scale_color": "silber",
+ "scale_material": "Metall",
+ "description": "Kompaktes Messer mit silbernem Metallskelettgriff und einer ausgeklappten, spitz zulaufenden Klinge. Die Schalenlänge liegt auf der Messunterlage ungefähr im Bereich 91/93 mm.",
+ "image_issues": [
+  "angled"
+ ]
+}

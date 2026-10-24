@@ -1,0 +1,25 @@
+{
+ "category": "MULTITOOL",
+ "category_confidence": 0.99,
+ "brand": "Gerber",
+ "brand_evidence": "Der Schriftzug „GERBER“ ist auf dem unteren Griff lesbar; auf dem oberen Griff steht „SUSPENSION“.",
+ "is_victorinox": false,
+ "model_guess": "Gerber Suspension",
+ "visible_sku": null,
+ "open_state": "partly",
+ "tools_seen": [
+  "blade_large"
+ ],
+ "tools_maybe": [],
+ "sheet_visible": true,
+ "length_zone": "91/93",
+ "length_zone_alt": null,
+ "length_zone_confidence": 0.82,
+ "length_estimate_mm": 93,
+ "scale_color": "schwarz und silber",
+ "scale_material": "Metall",
+ "description": "Zu sehen sind zwei übereinanderliegende Gerber-Multitools mit schwarzen und silbernen Metallgriffen; bei einem ist eine große Klinge ausgeklappt. Auf dem unteren Griff ist „GERBER“, auf dem oberen „SUSPENSION“ lesbar.",
+ "image_issues": [
+  "multiple_objects"
+ ]
+}

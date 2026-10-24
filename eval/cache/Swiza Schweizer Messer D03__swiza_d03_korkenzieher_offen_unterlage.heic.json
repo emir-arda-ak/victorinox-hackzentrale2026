@@ -1,0 +1,25 @@
+{
+ "category": "SAK",
+ "category_confidence": 0.96,
+ "brand": null,
+ "brand_evidence": "Weisses Kreuz in einem Kreis auf roter Schale; kein Schildumriss und kein lesbarer Markenname erkennbar",
+ "is_victorinox": null,
+ "model_guess": null,
+ "visible_sku": null,
+ "open_state": "partly",
+ "tools_seen": [
+  "corkscrew"
+ ],
+ "tools_maybe": [],
+ "sheet_visible": true,
+ "length_zone": "100",
+ "length_zone_alt": null,
+ "length_zone_confidence": 0.72,
+ "length_estimate_mm": 101,
+ "scale_color": "rot",
+ "scale_material": "Kunststoff",
+ "description": "Rotes Taschenmesser mit geöffnetem Korkenzieher und einem weissen Kreuz im Kreis auf der Schale. Weitere Werkzeuge sind auf dem Foto nicht klar erkennbar.",
+ "image_issues": [
+  "angled"
+ ]
+}

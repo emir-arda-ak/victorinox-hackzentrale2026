@@ -1,0 +1,25 @@
+{
+ "category": "OTHER_KNIFE",
+ "category_confidence": 0.94,
+ "brand": "Victorinox",
+ "brand_evidence": "Der Schriftzug VICTORINOX ist auf dem Griff lesbar.",
+ "is_victorinox": true,
+ "model_guess": null,
+ "visible_sku": null,
+ "open_state": "open",
+ "tools_seen": [
+  "blade_serrated"
+ ],
+ "tools_maybe": [],
+ "sheet_visible": true,
+ "length_zone": "130",
+ "length_zone_alt": null,
+ "length_zone_confidence": 0.55,
+ "length_estimate_mm": 140,
+ "scale_color": "silber",
+ "scale_material": "Metall",
+ "description": "Geöffnetes Messer mit metallischem Griff und einer langen Klinge mit Wellenschliff. Der Schriftzug VICTORINOX ist auf dem Griff sichtbar.",
+ "image_issues": [
+  "angled"
+ ]
+}

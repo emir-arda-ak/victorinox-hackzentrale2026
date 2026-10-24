@@ -1,0 +1,23 @@
+{
+ "category": "MULTITOOL",
+ "category_confidence": 0.91,
+ "brand": "Gerber",
+ "brand_evidence": "Schwach lesbarer Schriftzug „GERBER“ auf dem Metallgriff",
+ "is_victorinox": false,
+ "model_guess": null,
+ "visible_sku": null,
+ "open_state": "open",
+ "tools_seen": [
+  "scissors"
+ ],
+ "tools_maybe": [],
+ "sheet_visible": true,
+ "length_zone": "100",
+ "length_zone_alt": null,
+ "length_zone_confidence": 0.72,
+ "length_estimate_mm": 98,
+ "scale_color": "silber",
+ "scale_material": "Metall",
+ "description": "Silbernes Gerber-Multitool mit ausgeklapptem Scherenwerkzeug. Der Metallgriff liegt auf der Messunterlage und endet ungefähr im 100-mm-Bereich.",
+ "image_issues": []
+}

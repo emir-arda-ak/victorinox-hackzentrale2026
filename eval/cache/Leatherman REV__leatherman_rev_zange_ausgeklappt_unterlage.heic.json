@@ -1,0 +1,23 @@
+{
+ "category": "MULTITOOL",
+ "category_confidence": 0.99,
+ "brand": "Leatherman",
+ "brand_evidence": "Der Schriftzug „LEATHERMAN“ ist auf dem Griff lesbar.",
+ "is_victorinox": false,
+ "model_guess": null,
+ "visible_sku": null,
+ "open_state": "open",
+ "tools_seen": [
+  "pliers"
+ ],
+ "tools_maybe": [],
+ "sheet_visible": true,
+ "length_zone": "100",
+ "length_zone_alt": null,
+ "length_zone_confidence": 0.78,
+ "length_estimate_mm": 100,
+ "scale_color": "silber",
+ "scale_material": "Metall",
+ "description": "Silbernes Leatherman-Multitool mit geöffneten Zangengriffen und sichtbarer Zange. Der Schriftzug „LEATHERMAN“ ist auf dem Griff zu erkennen.",
+ "image_issues": []
+}

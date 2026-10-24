@@ -1,0 +1,23 @@
+{
+ "category": "MULTITOOL",
+ "category_confidence": 0.98,
+ "brand": "Victorinox",
+ "brand_evidence": "Auf dem Griff sind der Victorinox-Schriftzug und das Kreuz-Schild-Emblem sichtbar.",
+ "is_victorinox": true,
+ "model_guess": null,
+ "visible_sku": null,
+ "open_state": "partly",
+ "tools_seen": [
+  "saw_metal"
+ ],
+ "tools_maybe": [],
+ "sheet_visible": true,
+ "length_zone": "111",
+ "length_zone_alt": null,
+ "length_zone_confidence": 0.72,
+ "length_estimate_mm": 114,
+ "scale_color": "silber",
+ "scale_material": "Metall",
+ "description": "Silbernes Victorinox-Multitool mit ausgeklapptem, fein gezahntem Feilenwerkzeug. Die übrigen Werkzeuge sind nicht sichtbar.",
+ "image_issues": []
+}

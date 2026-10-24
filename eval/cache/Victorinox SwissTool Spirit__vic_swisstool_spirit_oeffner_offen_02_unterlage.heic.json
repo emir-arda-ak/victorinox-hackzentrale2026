@@ -1,0 +1,26 @@
+{
+ "category": "MULTITOOL",
+ "category_confidence": 0.56,
+ "brand": null,
+ "brand_evidence": null,
+ "is_victorinox": null,
+ "model_guess": null,
+ "visible_sku": null,
+ "open_state": "partly",
+ "tools_seen": [],
+ "tools_maybe": [
+  "other"
+ ],
+ "sheet_visible": true,
+ "length_zone": "130",
+ "length_zone_alt": null,
+ "length_zone_confidence": 0.62,
+ "length_estimate_mm": 125,
+ "scale_color": "schwarz",
+ "scale_material": "Metall",
+ "description": "Zu sehen ist ein dunkles, metallisches Multitool mit einem seitlich ausgeklappten, hakenförmigen Werkzeug; dessen Funktion ist nicht sicher erkennbar. Die Messunterlage ist sichtbar.",
+ "image_issues": [
+  "angled",
+  "multiple_objects"
+ ]
+}

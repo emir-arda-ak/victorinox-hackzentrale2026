@@ -1,0 +1,27 @@
+{
+ "category": "SAK",
+ "category_confidence": 0.78,
+ "brand": "Victorinox",
+ "brand_evidence": "Auf der oberen Schale sind der Text „VICTORINOX“ und das Kreuz-Schild-Emblem sichtbar.",
+ "is_victorinox": true,
+ "model_guess": null,
+ "visible_sku": null,
+ "open_state": "partly",
+ "tools_seen": [
+  "blade_large",
+  "corkscrew"
+ ],
+ "tools_maybe": [],
+ "sheet_visible": true,
+ "length_zone": "111",
+ "length_zone_alt": null,
+ "length_zone_confidence": 0.75,
+ "length_estimate_mm": 105,
+ "scale_color": "schwarz",
+ "scale_material": "Metall",
+ "description": "Zu sehen sind zwei dunkle Victorinox-Taschenmesser; an einem ist eine lange Klinge ausgeklappt, Korkenzieher sind ebenfalls sichtbar. Die Griffe liegen auf der Messunterlage und enden ungefähr im 111-mm-Bereich.",
+ "image_issues": [
+  "multiple_objects",
+  "angled"
+ ]
+}

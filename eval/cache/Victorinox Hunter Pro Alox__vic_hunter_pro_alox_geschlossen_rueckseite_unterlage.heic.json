@@ -1,0 +1,27 @@
+{
+ "category": "ONEHAND",
+ "category_confidence": 0.98,
+ "brand": null,
+ "brand_evidence": "Kein klar lesbares Markenwort oder Victorinox-Schild erkennbar",
+ "is_victorinox": null,
+ "model_guess": null,
+ "visible_sku": "0.9415.D20",
+ "open_state": "open",
+ "tools_seen": [
+  "blade_large",
+  "clip",
+  "thumb_stud"
+ ],
+ "tools_maybe": [],
+ "sheet_visible": true,
+ "length_zone": "130",
+ "length_zone_alt": null,
+ "length_zone_confidence": 0.86,
+ "length_estimate_mm": 132,
+ "scale_color": "rot",
+ "scale_material": "Grip",
+ "description": "Rotes Einhand-Taschenmesser mit ausgeklappter grosser Klinge, Daumenpin und Trageclip. Auf dem Messer liegt ein Etikett mit der Artikelnummer 0.9415.D20.",
+ "image_issues": [
+  "angled"
+ ]
+}

@@ -1,0 +1,29 @@
+{
+ "category": "SAK",
+ "category_confidence": 0.97,
+ "brand": "Victorinox",
+ "brand_evidence": "Weisses Kreuz in einem Schild auf der roten Schale",
+ "is_victorinox": true,
+ "model_guess": null,
+ "visible_sku": null,
+ "open_state": "partly",
+ "tools_seen": [
+  "key_ring"
+ ],
+ "tools_maybe": [
+  "corkscrew",
+  "bottle_opener"
+ ],
+ "sheet_visible": true,
+ "length_zone": "91/93",
+ "length_zone_alt": "100",
+ "length_zone_confidence": 0.54,
+ "length_estimate_mm": 95,
+ "scale_color": "rot",
+ "scale_material": "Cellidor",
+ "description": "Rotes Victorinox-Taschenmesser mit weissem Kreuz im Schild auf der Schale. Ein Ring und teilweise ausgeklappte Werkzeuge sind sichtbar.",
+ "image_issues": [
+  "angled",
+  "tools_hidden"
+ ]
+}

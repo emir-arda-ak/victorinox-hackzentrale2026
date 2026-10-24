@@ -1,0 +1,24 @@
+{
+ "category": "OTHER_KNIFE",
+ "category_confidence": 0.82,
+ "brand": null,
+ "brand_evidence": "Diamantförmiges Emblem auf dem Holzgriff; keine Markenaufschrift sicher lesbar",
+ "is_victorinox": false,
+ "model_guess": null,
+ "visible_sku": null,
+ "open_state": "open",
+ "tools_seen": [
+  "blade_large",
+  "lanyard_hole"
+ ],
+ "tools_maybe": [],
+ "sheet_visible": true,
+ "length_zone": "91/93",
+ "length_zone_alt": null,
+ "length_zone_confidence": 0.76,
+ "length_estimate_mm": 95,
+ "scale_color": "braun",
+ "scale_material": "Holz",
+ "description": "Ein Klappmesser mit braunen Holzgriffschalen und ausgeklappter großer Klinge. Am Griff ist ein geflochtenes Band befestigt.",
+ "image_issues": []
+}

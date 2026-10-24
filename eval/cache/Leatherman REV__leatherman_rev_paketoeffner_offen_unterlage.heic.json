@@ -1,0 +1,23 @@
+{
+ "category": "MULTITOOL",
+ "category_confidence": 0.99,
+ "brand": "Leatherman",
+ "brand_evidence": "Der Schriftzug „LEATHERMAN Rev“ ist auf dem Griff lesbar.",
+ "is_victorinox": false,
+ "model_guess": "Rev",
+ "visible_sku": null,
+ "open_state": "partly",
+ "tools_seen": [
+  "blade_large"
+ ],
+ "tools_maybe": [],
+ "sheet_visible": true,
+ "length_zone": "111",
+ "length_zone_alt": null,
+ "length_zone_confidence": 0.65,
+ "length_estimate_mm": 118,
+ "scale_color": "silber",
+ "scale_material": "Metall",
+ "description": "Silbernes Leatherman-Multitool mit teilweise ausgeklapptem, sichtbar beschriftetem Griff und einer ausgeklappten Klinge. Die gedruckte Messunterlage ist sichtbar.",
+ "image_issues": []
+}

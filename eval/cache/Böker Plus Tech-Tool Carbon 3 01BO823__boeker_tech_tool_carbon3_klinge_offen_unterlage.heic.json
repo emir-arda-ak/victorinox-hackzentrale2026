@@ -1,0 +1,23 @@
+{
+ "category": "ONEHAND",
+ "category_confidence": 0.88,
+ "brand": null,
+ "brand_evidence": "Auf der Klinge ist ein Logo oder Schriftzug zu sehen, aber nicht zuverlässig lesbar.",
+ "is_victorinox": null,
+ "model_guess": null,
+ "visible_sku": null,
+ "open_state": "open",
+ "tools_seen": [
+  "blade_large"
+ ],
+ "tools_maybe": [],
+ "sheet_visible": true,
+ "length_zone": "100",
+ "length_zone_alt": null,
+ "length_zone_confidence": 0.87,
+ "length_estimate_mm": 100,
+ "scale_color": "schwarz",
+ "scale_material": "Andere",
+ "description": "Ein geöffnetes Einhand-Taschenmesser mit schwarzem, carbonfaserähnlichem Griff und einer grossen Klinge. Auf der Klinge ist ein nicht eindeutig lesbares Logo oder Schriftzug erkennbar.",
+ "image_issues": []
+}

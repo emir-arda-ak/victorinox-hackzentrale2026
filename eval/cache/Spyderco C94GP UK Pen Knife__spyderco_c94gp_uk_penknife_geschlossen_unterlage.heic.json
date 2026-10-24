@@ -1,0 +1,27 @@
+{
+ "category": "ONEHAND",
+ "category_confidence": 0.99,
+ "brand": "Spyderco",
+ "brand_evidence": "Spinnen-Logo auf der Klinge",
+ "is_victorinox": false,
+ "model_guess": null,
+ "visible_sku": null,
+ "open_state": "partly",
+ "tools_seen": [
+  "blade_large",
+  "thumb_stud",
+  "clip"
+ ],
+ "tools_maybe": [],
+ "sheet_visible": true,
+ "length_zone": "111",
+ "length_zone_alt": null,
+ "length_zone_confidence": 0.78,
+ "length_estimate_mm": 112,
+ "scale_color": "schwarz",
+ "scale_material": "Grip",
+ "description": "Ein schwarzes Einhand-Klappmesser mit Spinnenlogo; die Klinge ist teilweise geöffnet. Sichtbar sind die Klinge, das runde Öffnungsloch und ein Trageclip.",
+ "image_issues": [
+  "angled"
+ ]
+}

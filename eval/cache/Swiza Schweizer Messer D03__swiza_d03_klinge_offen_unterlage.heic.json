@@ -1,0 +1,25 @@
+{
+ "category": "SAK",
+ "category_confidence": 0.94,
+ "brand": null,
+ "brand_evidence": "Weisses Kreuz in einem Kreis auf der roten Griffschale; kein deutlich erkennbares Schildemblem und kein lesbarer Markenname",
+ "is_victorinox": null,
+ "model_guess": null,
+ "visible_sku": null,
+ "open_state": "open",
+ "tools_seen": [
+  "blade_large"
+ ],
+ "tools_maybe": [],
+ "sheet_visible": true,
+ "length_zone": "100",
+ "length_zone_alt": null,
+ "length_zone_confidence": 0.86,
+ "length_estimate_mm": 100,
+ "scale_color": "rot",
+ "scale_material": "Kunststoff",
+ "description": "Rotes Taschenmesser mit geöffnetem grossem Klingenblatt und einem weissen Kreuz in einem Kreis auf der Griffschale. Weitere Werkzeuge sind im Foto nicht eindeutig erkennbar.",
+ "image_issues": [
+  "angled"
+ ]
+}

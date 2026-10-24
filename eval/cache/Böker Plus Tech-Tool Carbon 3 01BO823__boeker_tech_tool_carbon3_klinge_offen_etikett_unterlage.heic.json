@@ -1,0 +1,25 @@
+{
+ "category": "OTHER_KNIFE",
+ "category_confidence": 0.84,
+ "brand": null,
+ "brand_evidence": null,
+ "is_victorinox": null,
+ "model_guess": null,
+ "visible_sku": null,
+ "open_state": "open",
+ "tools_seen": [
+  "blade_large",
+  "corkscrew",
+  "clip"
+ ],
+ "tools_maybe": [],
+ "sheet_visible": true,
+ "length_zone": "111",
+ "length_zone_alt": null,
+ "length_zone_confidence": 0.72,
+ "length_estimate_mm": 114,
+ "scale_color": "schwarz",
+ "scale_material": "Andere",
+ "description": "Schwarzes Einhand-Klappmesser mit ausgeklappter Klinge, Trageclip und sichtbarem Korkenzieher. Die Griffschalen wirken strukturiert; eine Marke ist nicht eindeutig erkennbar.",
+ "image_issues": []
+}

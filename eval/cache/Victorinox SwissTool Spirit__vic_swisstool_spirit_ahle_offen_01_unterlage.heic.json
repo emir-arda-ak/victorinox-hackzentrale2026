@@ -1,0 +1,23 @@
+{
+ "category": "SAK",
+ "category_confidence": 0.87,
+ "brand": "Victorinox",
+ "brand_evidence": "VICTORINOX-Schriftzug und Schildemblem auf dem Griff sichtbar",
+ "is_victorinox": true,
+ "model_guess": null,
+ "visible_sku": "3.0323.L",
+ "open_state": "partly",
+ "tools_seen": [
+  "blade_large"
+ ],
+ "tools_maybe": [],
+ "sheet_visible": true,
+ "length_zone": "130",
+ "length_zone_alt": null,
+ "length_zone_confidence": 0.77,
+ "length_estimate_mm": 124,
+ "scale_color": "silber",
+ "scale_material": "Metall",
+ "description": "Schlankes, silbernes Victorinox-Taschenmesser mit geöffneter grosser Klinge und sichtbarer Längenskala am Griff. Auf der Messunterlage liegt ein Etikett mit der Artikelnummer 3.0323.L.",
+ "image_issues": []
+}

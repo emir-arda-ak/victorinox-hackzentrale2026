@@ -1,0 +1,27 @@
+{
+ "category": "MULTITOOL",
+ "category_confidence": 0.99,
+ "brand": "Gerber",
+ "brand_evidence": "Der Schriftzug „GERBER“ ist auf dem unteren Griff sichtbar; am oberen Griff steht „SUSPENSION“.",
+ "is_victorinox": false,
+ "model_guess": "Suspension",
+ "visible_sku": null,
+ "open_state": "partly",
+ "tools_seen": [
+  "blade_large"
+ ],
+ "tools_maybe": [
+  "pliers"
+ ],
+ "sheet_visible": true,
+ "length_zone": "100",
+ "length_zone_alt": "111",
+ "length_zone_confidence": 0.52,
+ "length_estimate_mm": 100,
+ "scale_color": "silber",
+ "scale_material": "Metall",
+ "description": "Zu sehen ist ein Gerber Suspension-Multitool mit metallischem Griff; eine lange Klinge ist ausgeklappt. Das Griffende liegt ungefähr im Bereich 100 mm, nahe der Grenze zur Zone 111.",
+ "image_issues": [
+  "multiple_objects"
+ ]
+}

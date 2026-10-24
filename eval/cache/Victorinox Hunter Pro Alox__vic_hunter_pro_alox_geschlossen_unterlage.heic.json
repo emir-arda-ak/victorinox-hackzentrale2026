@@ -1,0 +1,26 @@
+{
+ "category": "ONEHAND",
+ "category_confidence": 0.97,
+ "brand": "Victorinox",
+ "brand_evidence": "Auf der Klinge sind ein Victorinox-Schildemblem und der Schriftzug Victorinox erkennbar.",
+ "is_victorinox": true,
+ "model_guess": null,
+ "visible_sku": null,
+ "open_state": "open",
+ "tools_seen": [
+  "blade_large",
+  "thumb_stud"
+ ],
+ "tools_maybe": [
+  "lanyard_hole"
+ ],
+ "sheet_visible": true,
+ "length_zone": ">145",
+ "length_zone_alt": null,
+ "length_zone_confidence": 0.76,
+ "length_estimate_mm": 146,
+ "scale_color": "rot",
+ "scale_material": "Alox",
+ "description": "Rotes Einhand-Taschenmesser mit Victorinox-Klinge und Daumenpin. Die roten, strukturierten Griffschalen sind sichtbar.",
+ "image_issues": []
+}

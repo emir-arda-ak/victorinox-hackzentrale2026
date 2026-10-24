@@ -1,0 +1,23 @@
+{
+ "category": "NOT_A_KNIFE",
+ "category_confidence": 0.82,
+ "brand": null,
+ "brand_evidence": null,
+ "is_victorinox": null,
+ "model_guess": null,
+ "visible_sku": null,
+ "open_state": "partly",
+ "tools_seen": [
+  "bottle_opener"
+ ],
+ "tools_maybe": [],
+ "sheet_visible": true,
+ "length_zone": "130",
+ "length_zone_alt": null,
+ "length_zone_confidence": 0.73,
+ "length_estimate_mm": 117,
+ "scale_color": "schwarz",
+ "scale_material": "Metall",
+ "description": "Schwarzes, metallisches Klappwerkzeug mit einem sichtbar ausgeklappten kapselheberartigen Werkzeug. Eine Markenkennzeichnung ist nicht erkennbar.",
+ "image_issues": []
+}

@@ -1,0 +1,27 @@
+{
+ "category": "SAK",
+ "category_confidence": 0.99,
+ "brand": null,
+ "brand_evidence": null,
+ "is_victorinox": null,
+ "model_guess": null,
+ "visible_sku": "0.9583.MC",
+ "open_state": "closed",
+ "tools_seen": [
+  "tweezers",
+  "toothpick"
+ ],
+ "tools_maybe": [],
+ "sheet_visible": true,
+ "length_zone": ">145",
+ "length_zone_alt": null,
+ "length_zone_confidence": 0.25,
+ "length_estimate_mm": 135,
+ "scale_color": "rot und schwarz",
+ "scale_material": "Grip",
+ "description": "Geschlossenes Taschenmesser mit roten Griffschalen und schwarzen Grip-Einlagen; daneben liegen eine Pinzette und ein Zahnstocher. Auf dem Messer ist der Artikelcode 0.9583.MC sichtbar.",
+ "image_issues": [
+  "multiple_objects",
+  "angled"
+ ]
+}

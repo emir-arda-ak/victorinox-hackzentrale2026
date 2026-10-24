@@ -1,0 +1,27 @@
+{
+ "category": "SAK",
+ "category_confidence": 0.83,
+ "brand": null,
+ "brand_evidence": "Weisses Kreuz auf rotem, rundem Feld; kein klar erkennbarer Schildumriss und kein lesbarer Markenname",
+ "is_victorinox": null,
+ "model_guess": null,
+ "visible_sku": null,
+ "open_state": "partly",
+ "tools_seen": [
+  "bottle_opener"
+ ],
+ "tools_maybe": [
+  "blade_large"
+ ],
+ "sheet_visible": true,
+ "length_zone": "100",
+ "length_zone_alt": null,
+ "length_zone_confidence": 0.55,
+ "length_estimate_mm": 98,
+ "scale_color": "rot",
+ "scale_material": "Kunststoff",
+ "description": "Rotes Taschenmesser mit weissen Kreuz auf rundem Feld; ein breites Metallwerkzeug ist ausgeklappt, eine weitere Klinge ist nur teilweise zu erkennen. Die Schale endet ungefähr bei der 100-mm-Zone.",
+ "image_issues": [
+  "angled"
+ ]
+}

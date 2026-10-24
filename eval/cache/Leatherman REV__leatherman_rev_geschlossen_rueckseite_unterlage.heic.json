@@ -1,0 +1,23 @@
+{
+ "category": "MULTITOOL",
+ "category_confidence": 0.99,
+ "brand": "Leatherman",
+ "brand_evidence": "Der Schriftzug LEATHERMAN ist auf dem Trageclip lesbar.",
+ "is_victorinox": false,
+ "model_guess": null,
+ "visible_sku": null,
+ "open_state": "closed",
+ "tools_seen": [
+  "clip"
+ ],
+ "tools_maybe": [],
+ "sheet_visible": true,
+ "length_zone": "111",
+ "length_zone_alt": "100",
+ "length_zone_confidence": 0.58,
+ "length_estimate_mm": 105,
+ "scale_color": "silber",
+ "scale_material": "Metall",
+ "description": "Geschlossenes, silberfarbenes Leatherman-Multitool mit sichtbarem Trageclip. Die Werkzeuge sind eingeklappt.",
+ "image_issues": []
+}

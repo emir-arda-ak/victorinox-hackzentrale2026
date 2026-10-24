@@ -1,0 +1,25 @@
+{
+ "category": "MULTITOOL",
+ "category_confidence": 0.78,
+ "brand": null,
+ "brand_evidence": null,
+ "is_victorinox": null,
+ "model_guess": null,
+ "visible_sku": null,
+ "open_state": "open",
+ "tools_seen": [
+  "blade_large"
+ ],
+ "tools_maybe": [],
+ "sheet_visible": true,
+ "length_zone": "130",
+ "length_zone_alt": null,
+ "length_zone_confidence": 0.61,
+ "length_estimate_mm": 115,
+ "scale_color": "silber",
+ "scale_material": "Metall",
+ "description": "Silbernes, metallisches Multitool mit ausgeklappter grosser Klinge. Weitere Werkzeuge sind auf dem Foto nicht klar sichtbar.",
+ "image_issues": [
+  "angled"
+ ]
+}

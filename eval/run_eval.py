@@ -41,6 +41,7 @@ ap.add_argument("--out", default="eval/results.csv")
 ap.add_argument("--cache", default="eval/cache")
 ap.add_argument("--rescore", action="store_true", help="gespeicherte Erkennungen neu bewerten (/api/score, kein LLM)")
 ap.add_argument("--only", default="", help="nur Ordner/Dateien, deren Name diesen Text enthält")
+ap.add_argument("--no-sku", action="store_true", help="erkannte Artikelnummern (z. B. Etiketten auf Testmessern) für die Bewertung ignorieren")
 a = ap.parse_args()
 root = Path(a.images)
 cache = Path(a.cache); cache.mkdir(parents=True, exist_ok=True)
@@ -109,7 +110,7 @@ if a.only:
     items = [i for i in items if a.only.lower() in i[0].lower()]
 if not items:
     sys.exit(f"Keine Bilder gefunden ({a.truth}, {root}).")
-print(f"{len(items)} Bilder von {len({k for _, k, _ in items})} Messern\n")
+print(f"{len(items)} Bilder von {len({k for _, k, _ in items})} Messern" + (" · Artikelnummern ignoriert (--no-sku)" if a.no_sku else "") + "\n")
 
 out, lat, by_knife = [], [], {}
 for i, (rel, knife, r) in enumerate(items, 1):
@@ -120,7 +121,9 @@ for i, (rel, knife, r) in enumerate(items, 1):
         if a.rescore:
             if not cf.exists():
                 raise RuntimeError("keine gespeicherte Erkennung – zuerst ohne --rescore laufen lassen")
-            res = post("/api/score", {"extraction": json.loads(cf.read_text())})
+            ex0 = json.loads(cf.read_text())
+            if a.no_sku: ex0["visible_sku"] = None
+            res = post("/api/score", {"extraction": ex0})
         else:
             res = post("/api/match", {"image": data_url(root / rel)})
             if i == 1 or not globals().get("_ver_shown"):
@@ -162,7 +165,9 @@ knife_rows = []
 print("\nPro Messer (alle Fotos kombiniert):")
 for knife, k in by_knife.items():
     try:
-        res = post("/api/score", {"extraction": merge(k["exs"])})
+        mx = merge(k["exs"])
+        if a.no_sku: mx["visible_sku"] = None
+        res = post("/api/score", {"extraction": mx})
     except Exception as e:
         print(f"  {knife}: FEHLER {e}"); continue
     rk = res.get("ranking") or {}

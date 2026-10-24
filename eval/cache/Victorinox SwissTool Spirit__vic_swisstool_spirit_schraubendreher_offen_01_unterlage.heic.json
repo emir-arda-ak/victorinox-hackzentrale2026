@@ -1,0 +1,25 @@
+{
+ "category": "MULTITOOL",
+ "category_confidence": 0.99,
+ "brand": "Leatherman",
+ "brand_evidence": "Auf dem Griff ist ein Leatherman-Logo mit Schriftzug erkennbar.",
+ "is_victorinox": false,
+ "model_guess": null,
+ "visible_sku": null,
+ "open_state": "partly",
+ "tools_seen": [
+  "blade_serrated"
+ ],
+ "tools_maybe": [
+  "pliers"
+ ],
+ "sheet_visible": true,
+ "length_zone": "130",
+ "length_zone_alt": null,
+ "length_zone_confidence": 0.55,
+ "length_estimate_mm": 117,
+ "scale_color": "schwarz",
+ "scale_material": "Metall",
+ "description": "Schwarzes, plierbasiertes Multitool mit einem teilweise ausgeklappten, gezahnten Werkzeug. Die Zange ist eingeklappt und nicht sichtbar.",
+ "image_issues": []
+}

@@ -1,0 +1,26 @@
+{
+ "category": "SAK",
+ "category_confidence": 0.83,
+ "brand": null,
+ "brand_evidence": null,
+ "is_victorinox": null,
+ "model_guess": null,
+ "visible_sku": null,
+ "open_state": "open",
+ "tools_seen": [
+  "scissors",
+  "corkscrew"
+ ],
+ "tools_maybe": [],
+ "sheet_visible": true,
+ "length_zone": "84",
+ "length_zone_alt": "91/93",
+ "length_zone_confidence": 0.58,
+ "length_estimate_mm": 86,
+ "scale_color": "schwarz",
+ "scale_material": "Andere",
+ "description": "Dunkles Taschenmesser mit strukturierter schwarzer Griffschale; sichtbar sind eine geöffnete Schere und ein Korkenzieher.",
+ "image_issues": [
+  "angled"
+ ]
+}

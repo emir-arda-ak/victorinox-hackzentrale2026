@@ -1,0 +1,25 @@
+{
+ "category": "MULTITOOL",
+ "category_confidence": 0.99,
+ "brand": "Victorinox",
+ "brand_evidence": "Der Schriftzug VICTORINOX ist auf dem Metallgriff lesbar.",
+ "is_victorinox": true,
+ "model_guess": null,
+ "visible_sku": null,
+ "open_state": "open",
+ "tools_seen": [
+  "pliers"
+ ],
+ "tools_maybe": [],
+ "sheet_visible": true,
+ "length_zone": "111",
+ "length_zone_alt": null,
+ "length_zone_confidence": 0.72,
+ "length_estimate_mm": 115,
+ "scale_color": "silber",
+ "scale_material": "Metall",
+ "description": "Silbernes Victorinox-Multitool mit ausgeklappten Zangenbacken; weitere Werkzeuge sind eingeklappt. Der Griff liegt schräg auf der Messunterlage.",
+ "image_issues": [
+  "angled"
+ ]
+}

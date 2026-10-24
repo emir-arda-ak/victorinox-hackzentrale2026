@@ -1,0 +1,24 @@
+{
+ "category": "SAK",
+ "category_confidence": 0.99,
+ "brand": "Victorinox",
+ "brand_evidence": "Weisses Kreuz innerhalb eines Schildes auf der roten Griffschale",
+ "is_victorinox": true,
+ "model_guess": null,
+ "visible_sku": null,
+ "open_state": "open",
+ "tools_seen": [
+  "blade_large",
+  "key_ring"
+ ],
+ "tools_maybe": [],
+ "sheet_visible": true,
+ "length_zone": "58",
+ "length_zone_alt": "65",
+ "length_zone_confidence": 0.74,
+ "length_estimate_mm": 59,
+ "scale_color": "rot",
+ "scale_material": "Cellidor",
+ "description": "Rotes Victorinox-Taschenmesser mit geöffneter Klinge und sichtbarem Schlüsselring. Das Griffende liegt nahe der Grenze zwischen den Messzonen 58 und 65 mm.",
+ "image_issues": []
+}

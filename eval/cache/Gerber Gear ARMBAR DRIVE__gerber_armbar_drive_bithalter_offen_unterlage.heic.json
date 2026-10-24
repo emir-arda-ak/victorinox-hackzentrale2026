@@ -1,0 +1,27 @@
+{
+ "category": "OTHER_KNIFE",
+ "category_confidence": 0.79,
+ "brand": "Gerber",
+ "brand_evidence": "Text GERBER auf dem Griff",
+ "is_victorinox": false,
+ "model_guess": null,
+ "visible_sku": null,
+ "open_state": "partly",
+ "tools_seen": [
+  "bits"
+ ],
+ "tools_maybe": [
+  "screwdriver"
+ ],
+ "sheet_visible": true,
+ "length_zone": "91/93",
+ "length_zone_alt": "100",
+ "length_zone_confidence": 0.55,
+ "length_estimate_mm": 95,
+ "scale_color": "grau",
+ "scale_material": "Metall",
+ "description": "Graues Gerber-Multitool mit ausgeklapptem Bit-Halter und eingesetztem Bit. Der Griff liegt auf der Messunterlage; sein Ende liegt nahe der Grenze zwischen den Zonen 91/93 und 100.",
+ "image_issues": [
+  "angled"
+ ]
+}

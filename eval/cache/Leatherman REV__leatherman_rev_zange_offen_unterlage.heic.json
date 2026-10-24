@@ -1,0 +1,27 @@
+{
+ "category": "MULTITOOL",
+ "category_confidence": 1,
+ "brand": "Leatherman",
+ "brand_evidence": "Text LEATHERMAN auf dem Griff",
+ "is_victorinox": false,
+ "model_guess": null,
+ "visible_sku": null,
+ "open_state": "open",
+ "tools_seen": [
+  "pliers"
+ ],
+ "tools_maybe": [
+  "wire_cutter"
+ ],
+ "sheet_visible": true,
+ "length_zone": "100",
+ "length_zone_alt": null,
+ "length_zone_confidence": 0.55,
+ "length_estimate_mm": 100,
+ "scale_color": "silber",
+ "scale_material": "Metall",
+ "description": "Silbernes Leatherman-Multitool mit geöffneten Zangenbacken. Die Griffe bestehen aus Metall; weitere Werkzeuge sind nicht eindeutig sichtbar.",
+ "image_issues": [
+  "angled"
+ ]
+}

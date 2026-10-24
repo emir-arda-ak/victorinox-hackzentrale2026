@@ -1,0 +1,23 @@
+{
+ "category": "OTHER_KNIFE",
+ "category_confidence": 0.76,
+ "brand": "Victorinox",
+ "brand_evidence": "Der Schriftzug VICTORINOX ist auf dem Metallgriff erkennbar.",
+ "is_victorinox": true,
+ "model_guess": null,
+ "visible_sku": null,
+ "open_state": "open",
+ "tools_seen": [
+  "blade_large"
+ ],
+ "tools_maybe": [],
+ "sheet_visible": true,
+ "length_zone": "111",
+ "length_zone_alt": null,
+ "length_zone_confidence": 0.68,
+ "length_estimate_mm": 120,
+ "scale_color": "silber",
+ "scale_material": "Metall",
+ "description": "Offenes Taschenmesser mit silbernen Metallgriffen, Linealmarkierungen und einer ausgeklappten grossen Klinge. Der Schriftzug Victorinox ist auf dem Griff erkennbar.",
+ "image_issues": []
+}

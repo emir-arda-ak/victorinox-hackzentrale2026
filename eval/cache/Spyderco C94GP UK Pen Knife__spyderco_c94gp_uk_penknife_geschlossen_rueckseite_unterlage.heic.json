@@ -1,0 +1,23 @@
+{
+ "category": "ONEHAND",
+ "category_confidence": 0.99,
+ "brand": null,
+ "brand_evidence": null,
+ "is_victorinox": null,
+ "model_guess": null,
+ "visible_sku": null,
+ "open_state": "closed",
+ "tools_seen": [
+  "clip"
+ ],
+ "tools_maybe": [],
+ "sheet_visible": true,
+ "length_zone": "111",
+ "length_zone_alt": "100",
+ "length_zone_confidence": 0.55,
+ "length_estimate_mm": 106,
+ "scale_color": "schwarz",
+ "scale_material": "Kunststoff",
+ "description": "Geschlossenes Einhand-Klappmesser mit schwarzem, strukturiertem Griff, Daumenloch in der Klinge und Trageclip. Eine Marke ist nicht eindeutig lesbar.",
+ "image_issues": []
+}

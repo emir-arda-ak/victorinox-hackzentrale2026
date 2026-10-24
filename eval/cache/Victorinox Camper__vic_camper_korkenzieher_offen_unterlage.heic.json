@@ -1,0 +1,24 @@
+{
+ "category": "SAK",
+ "category_confidence": 0.99,
+ "brand": "Victorinox",
+ "brand_evidence": "Weisses Kreuz innerhalb eines Schildumrisses auf der roten Griffschale",
+ "is_victorinox": true,
+ "model_guess": null,
+ "visible_sku": null,
+ "open_state": "partly",
+ "tools_seen": [
+  "corkscrew",
+  "key_ring"
+ ],
+ "tools_maybe": [],
+ "sheet_visible": true,
+ "length_zone": "100",
+ "length_zone_alt": null,
+ "length_zone_confidence": 0.75,
+ "length_estimate_mm": 107,
+ "scale_color": "rot",
+ "scale_material": "Cellidor",
+ "description": "Rotes Victorinox-Taschenmesser mit teilweise ausgeklapptem Korkenzieher und sichtbarem Ring. Die Griffschalen sind rot.",
+ "image_issues": []
+}

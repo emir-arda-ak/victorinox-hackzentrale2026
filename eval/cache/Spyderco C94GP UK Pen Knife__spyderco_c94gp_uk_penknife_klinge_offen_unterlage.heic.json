@@ -1,0 +1,23 @@
+{
+ "category": "ONEHAND",
+ "category_confidence": 0.99,
+ "brand": "Spyderco",
+ "brand_evidence": "Spinnen-Logo und der Schriftzug SPYDERCO auf der Klinge",
+ "is_victorinox": false,
+ "model_guess": null,
+ "visible_sku": null,
+ "open_state": "open",
+ "tools_seen": [
+  "blade_large"
+ ],
+ "tools_maybe": [],
+ "sheet_visible": true,
+ "length_zone": "111",
+ "length_zone_alt": null,
+ "length_zone_confidence": 0.75,
+ "length_estimate_mm": 110,
+ "scale_color": "schwarz",
+ "scale_material": "Andere",
+ "description": "Schwarzes Einhand-Klappmesser mit geöffneter Klinge und rundem Daumenloch. Auf der Klinge sind das Spyderco-Logo und der Schriftzug erkennbar.",
+ "image_issues": []
+}

@@ -1,0 +1,21 @@
+{
+ "category": "MULTITOOL",
+ "category_confidence": 0.99,
+ "brand": "Gerber",
+ "brand_evidence": "Text GERBER ist auf dem unteren Griff lesbar; auf dem oberen steht SUSPENSION.",
+ "is_victorinox": false,
+ "model_guess": "Gerber Suspension",
+ "visible_sku": null,
+ "open_state": "closed",
+ "tools_seen": [],
+ "tools_maybe": [],
+ "sheet_visible": true,
+ "length_zone": "111",
+ "length_zone_alt": null,
+ "length_zone_confidence": 0.76,
+ "length_estimate_mm": 108,
+ "scale_color": "silber",
+ "scale_material": "Metall",
+ "description": "Geschlossenes, metallisches Gerber-Multitool mit der sichtbaren Aufschrift „SUSPENSION“. Auf der Messunterlage endet der Griff etwa im Bereich 111 mm.",
+ "image_issues": []
+}

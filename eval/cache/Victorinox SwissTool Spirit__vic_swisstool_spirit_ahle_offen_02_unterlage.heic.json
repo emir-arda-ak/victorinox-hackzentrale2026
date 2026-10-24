@@ -1,0 +1,27 @@
+{
+ "category": "OTHER_KNIFE",
+ "category_confidence": 0.36,
+ "brand": "Victorinox",
+ "brand_evidence": "Auf dem oberen Metallteil sind der Schriftzug VICTORINOX und ein Schildemblem erkennbar.",
+ "is_victorinox": true,
+ "model_guess": null,
+ "visible_sku": null,
+ "open_state": "partly",
+ "tools_seen": [],
+ "tools_maybe": [
+  "blade_large",
+  "ruler"
+ ],
+ "sheet_visible": true,
+ "length_zone": "130",
+ "length_zone_alt": null,
+ "length_zone_confidence": 0.42,
+ "length_estimate_mm": 140,
+ "scale_color": "silber",
+ "scale_material": "Metall",
+ "description": "Zu sehen sind zwei längliche, dunkle Metallteile mit Victorinox-Kennzeichnung; am unteren Teil ragt ein Werkzeug nach rechts heraus. Die genaue Bauart und die Werkzeuge sind nicht eindeutig erkennbar.",
+ "image_issues": [
+  "multiple_objects",
+  "angled"
+ ]
+}

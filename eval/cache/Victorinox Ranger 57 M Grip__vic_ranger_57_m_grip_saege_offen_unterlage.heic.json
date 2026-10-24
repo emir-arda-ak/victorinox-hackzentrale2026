@@ -1,0 +1,26 @@
+{
+ "category": "SAK",
+ "category_confidence": 0.98,
+ "brand": "Victorinox",
+ "brand_evidence": "Weisses Kreuz innerhalb eines Schild-Umrisses auf der roten Griffschale",
+ "is_victorinox": true,
+ "model_guess": null,
+ "visible_sku": null,
+ "open_state": "open",
+ "tools_seen": [
+  "saw_wood",
+  "corkscrew"
+ ],
+ "tools_maybe": [],
+ "sheet_visible": true,
+ "length_zone": "130",
+ "length_zone_alt": null,
+ "length_zone_confidence": 0.72,
+ "length_estimate_mm": 130,
+ "scale_color": "rot und schwarz",
+ "scale_material": "Grip",
+ "description": "Rotes und schwarzes Taschenmesser mit ausgeklappter grobzahniger Holzsäge und sichtbarem Korkenzieher. Das Victorinox-Schildemblem ist auf der Griffschale zu sehen.",
+ "image_issues": [
+  "angled"
+ ]
+}

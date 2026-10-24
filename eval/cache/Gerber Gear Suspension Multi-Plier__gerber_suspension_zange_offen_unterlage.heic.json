@@ -1,0 +1,27 @@
+{
+ "category": "MULTITOOL",
+ "category_confidence": 0.99,
+ "brand": "Gerber",
+ "brand_evidence": "Text GERBER ist auf einem Griff lesbar; auf dem anderen steht SUSPENSION.",
+ "is_victorinox": false,
+ "model_guess": "Suspension",
+ "visible_sku": null,
+ "open_state": "open",
+ "tools_seen": [
+  "pliers"
+ ],
+ "tools_maybe": [
+  "saw_wood"
+ ],
+ "sheet_visible": true,
+ "length_zone": null,
+ "length_zone_alt": null,
+ "length_zone_confidence": 0,
+ "length_estimate_mm": 100,
+ "scale_color": "silber",
+ "scale_material": "Metall",
+ "description": "Silbernes, plier-basiertes Gerber-Multitool mit geöffneten Zangenbacken. Im Griff sind gezahnte Werkzeugkanten sichtbar, deren Funktion nicht eindeutig erkennbar ist.",
+ "image_issues": [
+  "angled"
+ ]
+}

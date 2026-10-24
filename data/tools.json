@@ -73,7 +73,7 @@
  },
  "bits": {
   "label": "Bits / Bit-Halter",
-  "visibility": "normal"
+  "visibility": "prominent"
  },
  "screwdriver": {
   "label": "Schraubendreher",

@@ -1,0 +1,25 @@
+{
+ "category": "SAK",
+ "category_confidence": 0.58,
+ "brand": "Victorinox",
+ "brand_evidence": "Auf dem Metallgriff sind VICTORINOX und ein Schildemblem mit Kreuz erkennbar.",
+ "is_victorinox": true,
+ "model_guess": null,
+ "visible_sku": null,
+ "open_state": "partly",
+ "tools_seen": [
+  "saw_wood"
+ ],
+ "tools_maybe": [],
+ "sheet_visible": true,
+ "length_zone": "91/93",
+ "length_zone_alt": null,
+ "length_zone_confidence": 0.72,
+ "length_estimate_mm": 93,
+ "scale_color": "silber",
+ "scale_material": "Metall",
+ "description": "Silbernes Victorinox-Taschenwerkzeug mit ausgeklappter grobzahniger Säge und metallischen Griffteilen. Auf dem Griff ist eine Messskala zu sehen.",
+ "image_issues": [
+  "angled"
+ ]
+}

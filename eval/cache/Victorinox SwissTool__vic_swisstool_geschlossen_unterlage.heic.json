@@ -1,0 +1,21 @@
+{
+ "category": "MULTITOOL",
+ "category_confidence": 0.94,
+ "brand": "Victorinox",
+ "brand_evidence": "Auf dem Griff ist der Schriftzug VICTORINOX lesbar.",
+ "is_victorinox": true,
+ "model_guess": null,
+ "visible_sku": null,
+ "open_state": "closed",
+ "tools_seen": [],
+ "tools_maybe": [],
+ "sheet_visible": true,
+ "length_zone": "111",
+ "length_zone_alt": null,
+ "length_zone_confidence": 0.79,
+ "length_estimate_mm": 114,
+ "scale_color": "schwarz",
+ "scale_material": "Metall",
+ "description": "Geschlossenes, dunkles Victorinox-Multitool aus Metall. Auf dem Messblatt endet der Griff ungefähr bei 114 mm in der Zone 111.",
+ "image_issues": []
+}

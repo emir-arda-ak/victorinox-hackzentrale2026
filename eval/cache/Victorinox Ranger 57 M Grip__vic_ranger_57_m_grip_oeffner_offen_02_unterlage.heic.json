@@ -1,0 +1,28 @@
+{
+ "category": "SAK",
+ "category_confidence": 0.99,
+ "brand": "Victorinox",
+ "brand_evidence": "Weisses Kreuz in einem Schild auf der schwarzen Griffschale",
+ "is_victorinox": true,
+ "model_guess": null,
+ "visible_sku": null,
+ "open_state": "partly",
+ "tools_seen": [
+  "corkscrew",
+  "bottle_opener"
+ ],
+ "tools_maybe": [
+  "blade_large"
+ ],
+ "sheet_visible": true,
+ "length_zone": ">145",
+ "length_zone_alt": null,
+ "length_zone_confidence": 0.42,
+ "length_estimate_mm": 135,
+ "scale_color": "rot und schwarz",
+ "scale_material": "Grip",
+ "description": "Rotes und schwarzes Taschenmesser mit sichtbarem Victorinox-Schild, teilweise ausgeklappt. Sichtbar sind ein Korkenzieher und ein Kapselheber; eine weitere Klinge ist teilweise verdeckt.",
+ "image_issues": [
+  "angled"
+ ]
+}

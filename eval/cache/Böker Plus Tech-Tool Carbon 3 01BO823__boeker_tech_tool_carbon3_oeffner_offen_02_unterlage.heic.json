@@ -1,0 +1,27 @@
+{
+ "category": "SAK",
+ "category_confidence": 0.76,
+ "brand": null,
+ "brand_evidence": null,
+ "is_victorinox": null,
+ "model_guess": null,
+ "visible_sku": null,
+ "open_state": "open",
+ "tools_seen": [
+  "blade_serrated",
+  "corkscrew",
+  "clip"
+ ],
+ "tools_maybe": [],
+ "sheet_visible": true,
+ "length_zone": "100",
+ "length_zone_alt": null,
+ "length_zone_confidence": 0.64,
+ "length_estimate_mm": 94,
+ "scale_color": "schwarz",
+ "scale_material": "Andere",
+ "description": "Schwarzes Taschenmesser mit mehrlagigem Griff; eine gebogene, gezahnte Klinge, ein Korkenzieher und ein Trageclip sind sichtbar. Ein Markenlogo oder eine lesbare Markenaufschrift ist nicht erkennbar.",
+ "image_issues": [
+  "angled"
+ ]
+}

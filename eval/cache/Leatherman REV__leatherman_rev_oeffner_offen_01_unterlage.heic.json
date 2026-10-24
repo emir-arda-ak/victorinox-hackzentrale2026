@@ -1,0 +1,26 @@
+{
+ "category": "MULTITOOL",
+ "category_confidence": 1,
+ "brand": "Leatherman",
+ "brand_evidence": "Text LEATHERMAN auf dem Griff",
+ "is_victorinox": false,
+ "model_guess": "Rev",
+ "visible_sku": null,
+ "open_state": "partly",
+ "tools_seen": [
+  "blade_large",
+  "blade_serrated"
+ ],
+ "tools_maybe": [],
+ "sheet_visible": true,
+ "length_zone": "111",
+ "length_zone_alt": "100",
+ "length_zone_confidence": 0.55,
+ "length_estimate_mm": 106,
+ "scale_color": "silber",
+ "scale_material": "Metall",
+ "description": "Silbernes Leatherman-Multitool mit ausgeklapptem, teilweise gezahntem Messer. Der Griff liegt auf der Messunterlage und endet nahe der Grenze zwischen den Zonen 100 und 111.",
+ "image_issues": [
+  "angled"
+ ]
+}

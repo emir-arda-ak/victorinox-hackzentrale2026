@@ -1,0 +1,26 @@
+{
+ "category": "SAK",
+ "category_confidence": 0.99,
+ "brand": "Victorinox",
+ "brand_evidence": "Weisses Kreuz in einem Schildumriss auf der roten Schale",
+ "is_victorinox": true,
+ "model_guess": null,
+ "visible_sku": null,
+ "open_state": "partly",
+ "tools_seen": [
+  "blade_large",
+  "key_ring"
+ ],
+ "tools_maybe": [],
+ "sheet_visible": true,
+ "length_zone": "100",
+ "length_zone_alt": "91/93",
+ "length_zone_confidence": 0.57,
+ "length_estimate_mm": 94,
+ "scale_color": "rot",
+ "scale_material": "Cellidor",
+ "description": "Rotes Taschenmesser mit geöffnetem grossem Messer und sichtbarem Ring. Auf der Schale ist ein weisses Kreuz im Schild zu sehen.",
+ "image_issues": [
+  "angled"
+ ]
+}

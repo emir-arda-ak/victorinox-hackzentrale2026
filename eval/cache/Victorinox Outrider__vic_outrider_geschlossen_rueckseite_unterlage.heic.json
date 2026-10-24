@@ -1,0 +1,26 @@
+{
+ "category": "SAK",
+ "category_confidence": 0.98,
+ "brand": null,
+ "brand_evidence": null,
+ "is_victorinox": null,
+ "model_guess": null,
+ "visible_sku": "0.8513",
+ "open_state": "closed",
+ "tools_seen": [
+  "corkscrew",
+  "key_ring"
+ ],
+ "tools_maybe": [],
+ "sheet_visible": true,
+ "length_zone": "130",
+ "length_zone_alt": null,
+ "length_zone_confidence": 0.78,
+ "length_estimate_mm": 118,
+ "scale_color": "rot",
+ "scale_material": "Kunststoff",
+ "description": "Geschlossenes rotes Taschenmesser mit sichtbarem Korkenzieher und Schlüsselring. Auf dem Messer ist die Artikelnummer 0.8513 zu sehen.",
+ "image_issues": [
+  "angled"
+ ]
+}

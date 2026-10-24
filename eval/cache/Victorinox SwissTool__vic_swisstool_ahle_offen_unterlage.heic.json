@@ -1,0 +1,25 @@
+{
+ "category": "MULTITOOL",
+ "category_confidence": 0.99,
+ "brand": "Victorinox",
+ "brand_evidence": "Der Schriftzug „VICTORINOX“ ist auf dem Griff sichtbar.",
+ "is_victorinox": true,
+ "model_guess": null,
+ "visible_sku": null,
+ "open_state": "open",
+ "tools_seen": [
+  "blade_large"
+ ],
+ "tools_maybe": [],
+ "sheet_visible": true,
+ "length_zone": "91/93",
+ "length_zone_alt": null,
+ "length_zone_confidence": 0.85,
+ "length_estimate_mm": 92,
+ "scale_color": "schwarz",
+ "scale_material": "Metall",
+ "description": "Dunkles Victorinox-Multitool mit einer ausgeklappten großen Klinge. Die Griffe liegen auf der Messunterlage; weitere Werkzeuge sind nicht klar sichtbar.",
+ "image_issues": [
+  "angled"
+ ]
+}

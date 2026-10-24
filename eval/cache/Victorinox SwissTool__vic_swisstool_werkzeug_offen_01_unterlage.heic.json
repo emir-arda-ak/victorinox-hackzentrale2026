@@ -1,0 +1,27 @@
+{
+ "category": "SAK",
+ "category_confidence": 0.76,
+ "brand": "Victorinox",
+ "brand_evidence": "Der Schriftzug VICTORINOX ist auf dem oberen Griff lesbar.",
+ "is_victorinox": true,
+ "model_guess": null,
+ "visible_sku": null,
+ "open_state": "partly",
+ "tools_seen": [
+  "corkscrew",
+  "screwdriver"
+ ],
+ "tools_maybe": [],
+ "sheet_visible": true,
+ "length_zone": "111",
+ "length_zone_alt": null,
+ "length_zone_confidence": 0.66,
+ "length_estimate_mm": 112,
+ "scale_color": "silber",
+ "scale_material": "Metall",
+ "description": "Metallfarbenes Victorinox-Taschenmesser mit teilweise ausgeklapptem Schraubendreher und sichtbarem Korkenzieher. Der Griff liegt auf der Messunterlage und endet ungefähr bei 112 mm.",
+ "image_issues": [
+  "angled",
+  "multiple_objects"
+ ]
+}

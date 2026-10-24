@@ -1,0 +1,25 @@
+{
+ "category": "SAK",
+ "category_confidence": 0.98,
+ "brand": null,
+ "brand_evidence": null,
+ "is_victorinox": null,
+ "model_guess": null,
+ "visible_sku": "0.6163",
+ "open_state": "closed",
+ "tools_seen": [
+  "key_ring"
+ ],
+ "tools_maybe": [],
+ "sheet_visible": true,
+ "length_zone": "58",
+ "length_zone_alt": null,
+ "length_zone_confidence": 0.83,
+ "length_estimate_mm": 58,
+ "scale_color": "rot",
+ "scale_material": "Cellidor",
+ "description": "Geschlossenes, rotes Taschenmesser mit sichtbarem Schlüsselring. Auf dem Griff ist die Nummer 0.6163 zu sehen.",
+ "image_issues": [
+  "angled"
+ ]
+}

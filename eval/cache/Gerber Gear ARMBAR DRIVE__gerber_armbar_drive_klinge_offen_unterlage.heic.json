@@ -1,0 +1,23 @@
+{
+ "category": "ONEHAND",
+ "category_confidence": 0.97,
+ "brand": "Gerber",
+ "brand_evidence": "GERBER ist auf der Klinge lesbar; GERBER steht auch auf dem Griff.",
+ "is_victorinox": false,
+ "model_guess": null,
+ "visible_sku": null,
+ "open_state": "open",
+ "tools_seen": [
+  "blade_large"
+ ],
+ "tools_maybe": [],
+ "sheet_visible": true,
+ "length_zone": "100",
+ "length_zone_alt": "91/93",
+ "length_zone_confidence": 0.69,
+ "length_estimate_mm": 98,
+ "scale_color": "grau",
+ "scale_material": "Metall",
+ "description": "Graues Gerber-Einhandmesser mit geöffneter großer Klinge und skelettiertem Metallgriff.",
+ "image_issues": []
+}

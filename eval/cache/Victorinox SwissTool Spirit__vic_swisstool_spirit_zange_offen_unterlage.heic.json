@@ -1,0 +1,30 @@
+{
+ "category": "MULTITOOL",
+ "category_confidence": 0.99,
+ "brand": "Victorinox",
+ "brand_evidence": "Der Schriftzug VICTORINOX und ein kleines Schildemblem sind auf dem Griff sichtbar.",
+ "is_victorinox": true,
+ "model_guess": "SwissTool",
+ "visible_sku": null,
+ "open_state": "open",
+ "tools_seen": [
+  "pliers",
+  "blade_large",
+  "ruler"
+ ],
+ "tools_maybe": [
+  "wire_cutter"
+ ],
+ "sheet_visible": true,
+ "length_zone": "130",
+ "length_zone_alt": null,
+ "length_zone_confidence": 0.52,
+ "length_estimate_mm": 120,
+ "scale_color": "silber",
+ "scale_material": "Metall",
+ "description": "Silbernes, geöffnetes Victorinox-Zangenmultitool mit sichtbarer Klinge und Skala auf dem Griff. Die Länge ist auf der Messunterlage wegen der schrägen Lage nur ungefähr ablesbar.",
+ "image_issues": [
+  "angled",
+  "glare"
+ ]
+}

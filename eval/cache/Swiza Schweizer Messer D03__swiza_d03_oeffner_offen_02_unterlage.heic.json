@@ -1,0 +1,27 @@
+{
+ "category": "SAK",
+ "category_confidence": 0.98,
+ "brand": "Swiza",
+ "brand_evidence": "Der Schriftzug „SWIZA“ ist auf dem sichtbaren Metallteil lesbar; auf der roten Griffschale ist ein weisses Kreuz ohne klar erkennbare Schildumrandung.",
+ "is_victorinox": false,
+ "model_guess": null,
+ "visible_sku": null,
+ "open_state": "partly",
+ "tools_seen": [
+  "blade_large"
+ ],
+ "tools_maybe": [
+  "bottle_opener"
+ ],
+ "sheet_visible": true,
+ "length_zone": "100",
+ "length_zone_alt": "91/93",
+ "length_zone_confidence": 0.56,
+ "length_estimate_mm": 95,
+ "scale_color": "rot",
+ "scale_material": "Kunststoff",
+ "description": "Rotes Swiza-Taschenmesser mit sichtbarer grosser Klinge und einem teilweise ausgeklappten weiteren Werkzeug. Das Messer liegt auf der Product-Match-Messunterlage; das Griffende liegt nahe der Grenze zwischen den Zonen 91/93 und 100.",
+ "image_issues": [
+  "angled"
+ ]
+}

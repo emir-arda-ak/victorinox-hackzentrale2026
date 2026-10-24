@@ -1,0 +1,26 @@
+{
+ "category": "SAK",
+ "category_confidence": 0.98,
+ "brand": "Victorinox",
+ "brand_evidence": "Weisses Kreuz innerhalb eines Schildumrisses auf der roten Griffschale",
+ "is_victorinox": true,
+ "model_guess": null,
+ "visible_sku": null,
+ "open_state": "partly",
+ "tools_seen": [
+  "saw_wood",
+  "key_ring"
+ ],
+ "tools_maybe": [],
+ "sheet_visible": true,
+ "length_zone": "111",
+ "length_zone_alt": null,
+ "length_zone_confidence": 0.67,
+ "length_estimate_mm": 112,
+ "scale_color": "rot",
+ "scale_material": "Cellidor",
+ "description": "Rotes Schweizer Taschenmesser mit ausgeklappter Holzsäge und sichtbarem Schlüsselring. Auf der Griffschale ist ein weisses Kreuz im Schild zu sehen.",
+ "image_issues": [
+  "angled"
+ ]
+}

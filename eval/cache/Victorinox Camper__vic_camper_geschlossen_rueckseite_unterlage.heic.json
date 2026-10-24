@@ -1,0 +1,26 @@
+{
+ "category": "SAK",
+ "category_confidence": 0.98,
+ "brand": null,
+ "brand_evidence": null,
+ "is_victorinox": null,
+ "model_guess": null,
+ "visible_sku": "1.3613",
+ "open_state": "partly",
+ "tools_seen": [
+  "corkscrew",
+  "key_ring"
+ ],
+ "tools_maybe": [],
+ "sheet_visible": true,
+ "length_zone": "91/93",
+ "length_zone_alt": "100",
+ "length_zone_confidence": 0.74,
+ "length_estimate_mm": 94,
+ "scale_color": "rot",
+ "scale_material": "Kunststoff",
+ "description": "Rotes Taschenmesser mit ausgeklapptem Korkenzieher und sichtbarem Ring. Auf dem Griff ist die Artikelnummer 1.3613 zu sehen.",
+ "image_issues": [
+  "angled"
+ ]
+}

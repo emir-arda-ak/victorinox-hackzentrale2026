@@ -1,0 +1,23 @@
+{
+ "category": "SAK",
+ "category_confidence": 0.85,
+ "brand": null,
+ "brand_evidence": "Kleines Emblem auf der Holzschale ist sichtbar, aber nicht eindeutig lesbar oder als Victorinox-Schild erkennbar",
+ "is_victorinox": null,
+ "model_guess": null,
+ "visible_sku": null,
+ "open_state": "closed",
+ "tools_seen": [
+  "lanyard_hole"
+ ],
+ "tools_maybe": [],
+ "sheet_visible": true,
+ "length_zone": "91/93",
+ "length_zone_alt": null,
+ "length_zone_confidence": 0.78,
+ "length_estimate_mm": 92,
+ "scale_color": "braun",
+ "scale_material": "Holz",
+ "description": "Geschlossenes Taschenmesser mit braunen Holzschalen, kleinem Emblem und einer sichtbaren Kordel am Griffende. Die Werkzeuge sind eingeklappt.",
+ "image_issues": []
+}

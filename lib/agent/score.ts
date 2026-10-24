@@ -30,6 +30,9 @@ const W = SCORING.weights;
 const visW = (t: ToolId) => SCORING.tool_visibility_weight[(TOOL_META[t]?.visibility ?? "normal") as Visibility];
 const norm = (s: string | null | undefined) => (s ?? "").toLowerCase().replace(/[^a-z0-9]/g, "");
 
+/** absolute blade size cannot be judged on a photo: a "large" blade may be the only (small) blade of a 58 mm knife */
+const BLADE_TWIN: Partial<Record<ToolId, ToolId>> = { blade_large: "blade_small", blade_small: "blade_large" };
+
 function toolScore(c: CatalogModel, ex: Extraction, ans: Answers) {
   const main = new Set<ToolId>(c.tools);
   const sub = new Set<ToolId>(c.subtools);
@@ -44,6 +47,7 @@ function toolScore(c: CatalogModel, ex: Extraction, ans: Answers) {
     norm_ += w;
     if (main.has(t)) sum += w;
     else if (sub.has(t)) sum += w * SCORING.tool_seen_as_subtool_credit;
+    else if (BLADE_TWIN[t] && main.has(BLADE_TWIN[t])) sum += w * SCORING.blade_size_swap_credit;
     else sum -= w * SCORING.tool_seen_but_missing_penalty;
   }
   for (const t of maybe) {
@@ -170,7 +174,8 @@ function toolRows(c: CatalogModel, ex: Extraction, ans: Answers): ToolRow[] {
   const rows: ToolRow[] = [];
   for (const t of seen) {
     if (t === "other") continue;
-    rows.push({ tool: t, label: TOOL_META[t].label, status: cand.has(t) ? "both" : "missing" });
+    const twin = BLADE_TWIN[t];
+    rows.push({ tool: t, label: TOOL_META[t].label, status: cand.has(t) || (!!twin && cand.has(twin)) ? "both" : "missing" });
   }
   for (const t of c.tools) {
     if (seen.has(t) || t === "other") continue;
@@ -210,6 +215,10 @@ export function score(ex: Extraction, ans: Answers, learned: LearnedRule[] = [])
   const fit = Math.max(0, Math.min(1, (top[0]?.total ?? 0) / maxPossible));
   const sep = 1 - Math.exp(-SCORING.confidence.margin_scale * Math.max(0, margin));
   let confidence = (0.5 * fit + 0.5 * sep) * (0.4 + 0.6 * evidence(ex, ans));
+  if (top[0]) {
+    const missing = toolRows(top[0].c, ex, ans).filter((r) => r.status === "missing").length;
+    confidence *= Math.max(0.3, 1 - SCORING.confidence.missing_tool_factor * missing);
+  }
   if (top[0] && top[0].parts.visible_sku >= W.visible_sku) confidence = Math.max(confidence, 0.95);
 
   const reasons: string[] = [];

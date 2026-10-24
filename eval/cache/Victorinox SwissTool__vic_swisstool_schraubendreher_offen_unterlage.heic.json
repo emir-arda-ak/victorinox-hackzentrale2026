@@ -1,0 +1,27 @@
+{
+ "category": "MULTITOOL",
+ "category_confidence": 0.62,
+ "brand": "Victorinox",
+ "brand_evidence": "Der Schriftzug „VICTORINOX“ ist auf dem Griff lesbar.",
+ "is_victorinox": true,
+ "model_guess": null,
+ "visible_sku": null,
+ "open_state": "partly",
+ "tools_seen": [
+  "blade_large"
+ ],
+ "tools_maybe": [
+  "pliers"
+ ],
+ "sheet_visible": true,
+ "length_zone": "130",
+ "length_zone_alt": null,
+ "length_zone_confidence": 0.72,
+ "length_estimate_mm": 122,
+ "scale_color": "schwarz",
+ "scale_material": "Metall",
+ "description": "Zu sehen ist ein dunkles Victorinox-Multitool mit einem ausgeklappten, großen Messer. Die Zange ist nicht klar sichtbar; das Griffende liegt ungefähr im 130-mm-Bereich der Messunterlage.",
+ "image_issues": [
+  "multiple_objects"
+ ]
+}

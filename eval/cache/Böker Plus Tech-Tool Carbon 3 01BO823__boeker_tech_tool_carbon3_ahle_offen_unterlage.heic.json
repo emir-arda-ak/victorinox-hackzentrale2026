@@ -1,0 +1,25 @@
+{
+ "category": "SAK",
+ "category_confidence": 0.84,
+ "brand": null,
+ "brand_evidence": "Kein lesbares Markenlogo oder lesbarer Markenname erkennbar.",
+ "is_victorinox": null,
+ "model_guess": null,
+ "visible_sku": null,
+ "open_state": "partly",
+ "tools_seen": [
+  "blade_large",
+  "corkscrew",
+  "clip"
+ ],
+ "tools_maybe": [],
+ "sheet_visible": true,
+ "length_zone": "100",
+ "length_zone_alt": null,
+ "length_zone_confidence": 0.91,
+ "length_estimate_mm": 100,
+ "scale_color": "schwarz",
+ "scale_material": "Andere",
+ "description": "Schwarzes Taschenmesser mit strukturierter Griffschale; sichtbar sind eine ausgeklappte Klinge, ein Korkenzieher und ein Trageclip. Die Griffschale endet ungefähr im 100-mm-Bereich der Messunterlage.",
+ "image_issues": []
+}

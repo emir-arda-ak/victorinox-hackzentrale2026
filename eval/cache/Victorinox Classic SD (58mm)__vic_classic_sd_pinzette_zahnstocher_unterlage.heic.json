@@ -1,0 +1,27 @@
+{
+ "category": "SAK",
+ "category_confidence": 0.98,
+ "brand": "Victorinox",
+ "brand_evidence": "Weisses Kreuz in einem schildförmigen Umriss auf der roten Schale",
+ "is_victorinox": true,
+ "model_guess": "Classic SD",
+ "visible_sku": null,
+ "open_state": "closed",
+ "tools_seen": [
+  "tweezers",
+  "toothpick",
+  "key_ring"
+ ],
+ "tools_maybe": [],
+ "sheet_visible": true,
+ "length_zone": "65",
+ "length_zone_alt": "58",
+ "length_zone_confidence": 0.55,
+ "length_estimate_mm": 60,
+ "scale_color": "rot",
+ "scale_material": "Cellidor",
+ "description": "Kleines rotes Taschenmesser mit sichtbarem Victorinox-Schildemblem; die Werkzeuge sind geschlossen. Pinzette, Zahnstocher und Schlüsselring sind sichtbar.",
+ "image_issues": [
+  "angled"
+ ]
+}

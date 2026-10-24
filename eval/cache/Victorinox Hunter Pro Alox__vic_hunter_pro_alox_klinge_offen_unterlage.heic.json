@@ -1,0 +1,27 @@
+{
+ "category": "ONEHAND",
+ "category_confidence": 0.99,
+ "brand": "Wenger",
+ "brand_evidence": "Der Schriftzug WENGER ist auf der Klinge lesbar; auf dem roten Griff ist ein weisses Kreuz in einem Schild zu sehen.",
+ "is_victorinox": true,
+ "model_guess": null,
+ "visible_sku": null,
+ "open_state": "open",
+ "tools_seen": [
+  "blade_large",
+  "thumb_stud",
+  "lanyard_hole"
+ ],
+ "tools_maybe": [],
+ "sheet_visible": true,
+ "length_zone": "100",
+ "length_zone_alt": null,
+ "length_zone_confidence": 0.59,
+ "length_estimate_mm": 100,
+ "scale_color": "rot",
+ "scale_material": "Grip",
+ "description": "Rotes Einhandmesser mit grosser, geöffneter Klinge, Daumenpin und Befestigungsöse. Auf dem Griff ist ein weisses Kreuz im Schild zu sehen.",
+ "image_issues": [
+  "angled"
+ ]
+}

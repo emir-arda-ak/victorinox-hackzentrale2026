@@ -1,0 +1,25 @@
+{
+ "category": "MULTITOOL",
+ "category_confidence": 0.99,
+ "brand": "Gerber",
+ "brand_evidence": "Der Schriftzug „GERBER“ ist auf dem unteren Griff lesbar.",
+ "is_victorinox": false,
+ "model_guess": "Suspension",
+ "visible_sku": null,
+ "open_state": "partly",
+ "tools_seen": [
+  "saw_wood"
+ ],
+ "tools_maybe": [
+  "pliers"
+ ],
+ "sheet_visible": true,
+ "length_zone": "100",
+ "length_zone_alt": null,
+ "length_zone_confidence": 0.78,
+ "length_estimate_mm": 100,
+ "scale_color": "silber",
+ "scale_material": "Metall",
+ "description": "Silberner Gerber-Multitool mit ausgeklapptem Sägeblatt und skelettierten Metallgriffen. Der Schriftzug „SUSPENSION“ ist auf dem oberen Griff zu erkennen.",
+ "image_issues": []
+}

@@ -1,0 +1,26 @@
+{
+ "category": "ONEHAND",
+ "category_confidence": 0.98,
+ "brand": "Leatherman",
+ "brand_evidence": "Text LEATHERMAN auf der Klinge",
+ "is_victorinox": false,
+ "model_guess": null,
+ "visible_sku": null,
+ "open_state": "open",
+ "tools_seen": [
+  "blade_large",
+  "blade_serrated"
+ ],
+ "tools_maybe": [],
+ "sheet_visible": true,
+ "length_zone": "111",
+ "length_zone_alt": null,
+ "length_zone_confidence": 0.76,
+ "length_estimate_mm": 112,
+ "scale_color": "schwarz",
+ "scale_material": null,
+ "description": "Schwarzes Leatherman-Einhandmesser mit geöffneter, teilweise wellengeschliffener Klinge. Die Griffschale ist strukturiert.",
+ "image_issues": [
+  "angled"
+ ]
+}

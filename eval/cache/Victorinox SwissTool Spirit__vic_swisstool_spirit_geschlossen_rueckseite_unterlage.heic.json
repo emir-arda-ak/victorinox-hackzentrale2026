@@ -1,0 +1,23 @@
+{
+ "category": "MULTITOOL",
+ "category_confidence": 0.97,
+ "brand": "Victorinox",
+ "brand_evidence": "Victorinox-Text und Kreuz-im-Schild-Emblem auf dem oberen Metallgriff; Artikelnummer 3.0323.L sichtbar",
+ "is_victorinox": true,
+ "model_guess": null,
+ "visible_sku": "3.0323.L",
+ "open_state": "closed",
+ "tools_seen": [],
+ "tools_maybe": [],
+ "sheet_visible": true,
+ "length_zone": "130",
+ "length_zone_alt": null,
+ "length_zone_confidence": 0.86,
+ "length_estimate_mm": 120,
+ "scale_color": "silber",
+ "scale_material": "Metall",
+ "description": "Zwei geschlossene, silberne Victorinox-Multitools liegen auf der Messunterlage; auf einem Griff sind Victorinox-Logo und die Artikelnummer 3.0323.L sichtbar. Ausgeklappte Werkzeuge sind nicht zu sehen.",
+ "image_issues": [
+  "multiple_objects"
+ ]
+}

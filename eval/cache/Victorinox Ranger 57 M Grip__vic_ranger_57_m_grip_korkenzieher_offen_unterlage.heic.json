@@ -1,0 +1,27 @@
+{
+ "category": "SAK",
+ "category_confidence": 0.96,
+ "brand": null,
+ "brand_evidence": "Kreuz in einem schildförmigen Emblem; kein lesbarer Markenname",
+ "is_victorinox": null,
+ "model_guess": null,
+ "visible_sku": null,
+ "open_state": "open",
+ "tools_seen": [
+  "blade_large",
+  "corkscrew",
+  "key_ring"
+ ],
+ "tools_maybe": [],
+ "sheet_visible": true,
+ "length_zone": "130",
+ "length_zone_alt": null,
+ "length_zone_confidence": 0.83,
+ "length_estimate_mm": 135,
+ "scale_color": "rot und schwarz",
+ "scale_material": "Grip",
+ "description": "Rotes Taschenmesser mit schwarzen Griffeinlagen und schildförmigem Kreuzemblem. Sichtbar sind eine grosse Klinge, ein Korkenzieher und ein Ring.",
+ "image_issues": [
+  "angled"
+ ]
+}

@@ -1,0 +1,23 @@
+{
+ "category": "MULTITOOL",
+ "category_confidence": 0.98,
+ "brand": "Victorinox",
+ "brand_evidence": "Auf dem Metallgriff ist der Schriftzug «VICTORINOX» lesbar.",
+ "is_victorinox": true,
+ "model_guess": null,
+ "visible_sku": null,
+ "open_state": "partly",
+ "tools_seen": [
+  "bottle_opener"
+ ],
+ "tools_maybe": [],
+ "sheet_visible": true,
+ "length_zone": "111",
+ "length_zone_alt": null,
+ "length_zone_confidence": 0.73,
+ "length_estimate_mm": 112,
+ "scale_color": "silber",
+ "scale_material": "Metall",
+ "description": "Silbernes Victorinox-Multitool mit Metallgriffen; ein flaches, hakenförmiges Werkzeug ist ausgeklappt sichtbar.",
+ "image_issues": []
+}

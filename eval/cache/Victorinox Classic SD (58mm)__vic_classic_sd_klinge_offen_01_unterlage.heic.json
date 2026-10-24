@@ -1,0 +1,26 @@
+{
+ "category": "SAK",
+ "category_confidence": 0.98,
+ "brand": "Victorinox",
+ "brand_evidence": "Weisses Kreuz im Schild auf der roten Griffschale",
+ "is_victorinox": true,
+ "model_guess": null,
+ "visible_sku": null,
+ "open_state": "open",
+ "tools_seen": [
+  "blade_large",
+  "key_ring"
+ ],
+ "tools_maybe": [
+  "corkscrew"
+ ],
+ "sheet_visible": true,
+ "length_zone": "100",
+ "length_zone_alt": "111",
+ "length_zone_confidence": 0.68,
+ "length_estimate_mm": 103,
+ "scale_color": "rot",
+ "scale_material": "Cellidor",
+ "description": "Rotes Schweizer Taschenmesser mit geöffneter grosser Klinge und sichtbarem Schlüsselring. Auf der Griffschale ist das Victorinox-Kreuz im Schild zu sehen; ein weiteres Werkzeug ist nur teilweise erkennbar.",
+ "image_issues": []
+}

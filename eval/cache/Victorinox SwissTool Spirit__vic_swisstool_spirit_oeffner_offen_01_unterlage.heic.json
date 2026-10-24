@@ -1,0 +1,25 @@
+{
+ "category": "SAK",
+ "category_confidence": 0.72,
+ "brand": null,
+ "brand_evidence": "Auf den dunklen Metallschalen ist kein Markenname und kein eindeutig erkennbares Victorinox-Schild sichtbar.",
+ "is_victorinox": null,
+ "model_guess": null,
+ "visible_sku": null,
+ "open_state": "partly",
+ "tools_seen": [
+  "bottle_opener"
+ ],
+ "tools_maybe": [],
+ "sheet_visible": true,
+ "length_zone": "111",
+ "length_zone_alt": null,
+ "length_zone_confidence": 0.78,
+ "length_estimate_mm": 114,
+ "scale_color": "schwarz",
+ "scale_material": "Metall",
+ "description": "Dunkles, metallisch wirkendes Taschenmesser mit teilweise ausgeklapptem, kapselheberähnlichem Werkzeug. Die Marke ist nicht eindeutig erkennbar.",
+ "image_issues": [
+  "angled"
+ ]
+}
