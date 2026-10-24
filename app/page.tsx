@@ -324,13 +324,19 @@ export default function Home() {
       {stage !== "start" && (<>
         {photos.length > 0 && (
           <Section className="pt-5">
-            <div className="flex gap-2 overflow-x-auto">
-              {photos.map((p, i) => (
-                // eslint-disable-next-line @next/next/no-img-element
-                <img key={i} src={p} alt={`Foto ${i + 1}`}
-                  className={`size-16 flex-none border border-vx-border object-cover ${working && i >= extractions.length ? "animate-pulse opacity-60" : ""}`} />
-              ))}
-            </div>
+            <details open={working} className="group">
+              <summary className="flex cursor-pointer list-none items-center justify-between border-y border-vx-line py-3">
+                <span className="vx-section">Eingabe-Fotos · {photos.length}</span>
+                <span className="rotate-90 transition group-open:-rotate-90">{Ico.chevron}</span>
+              </summary>
+              <div className="mt-3 flex gap-2 overflow-x-auto">
+                {photos.map((p, i) => (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img key={i} src={p} alt={`Foto ${i + 1}`}
+                    className={`size-16 flex-none border border-vx-border object-cover ${working && i >= extractions.length ? "animate-pulse opacity-60" : ""}`} />
+                ))}
+              </div>
+            </details>
           </Section>
         )}
 
