@@ -87,11 +87,31 @@ async function postJson<T>(url: string, body: unknown): Promise<T> {
   return j as T;
 }
 
+/** positive, honest wording for the heuristic match score (not a probability) */
 const LEVEL = {
-  high: { text: "Hoch" },
-  medium: { text: "Mittel" },
-  low: { text: "Niedrig" },
+  high: { text: "Sehr gute Übereinstimmung", seg: 3 },
+  medium: { text: "Gute Übereinstimmung", seg: 2 },
+  low: { text: "Vorläufiger Vorschlag", seg: 1 },
 } as const;
+
+/** turn the scorer's reasons into what speaks for the match, and what would make it more certain */
+function splitReasons(reasons: string[]) {
+  const good: string[] = [], tips: string[] = [];
+  for (const r of reasons) {
+    if (/^Länge (gemessen|angegeben): Zone (.+)$/.test(r)) good.push(r.replace(/^Länge (gemessen|angegeben): Zone (.+)$/, "Länge $1 (Zone $2)"));
+    else if (r === "Länge nicht gemessen") tips.push("Messer auf die Messunterlage legen");
+    else if (r.startsWith("Marke erkannt")) good.push(r);
+    else if (r === "Marke nicht erkannt") tips.push("Logo oder Artikelnummer fotografieren");
+    else if (r === "Werkzeuge teilweise verdeckt") tips.push("Weitere Fotos mit aufgeklappten Werkzeugen");
+    else if (r.startsWith("Bild:")) tips.push("Schärferes, gut beleuchtetes Foto");
+    else if (r === "Mehrere Modelle fast gleich passend") tips.push("Ähnliche Modelle unter „Weitere Kandidaten“ vergleichen");
+    else if (r.startsWith("Kategorie widerspricht")) tips.push("Kategorie unter „Merkmale korrigieren“ prüfen");
+    else if (r === "Ersatz nach Funktionen gewählt") good.push("Ersatz nach Funktionen gewählt");
+    else if (/funktional gleiche Variante/.test(r)) good.push(r.replace(/^(\d+) funktional gleiche Variante(n?)/, "$1 gleichwertige Variante$2"));
+    else good.push(r);
+  }
+  return { good, tips };
+}
 
 const STATUS = {
   both: { sym: "✓", cls: "text-vx-ink", title: "bei beiden" },
@@ -488,7 +508,7 @@ export default function Home() {
           <div className="mt-4 flex gap-3 border-l-[3px] border-[#d4a017] bg-[#fdf6e3] p-4">
             <span className="text-[#8a6100]">{Ico.warn}</span>
             <div>
-              <p className="text-[16px] font-semibold">Erkennung unsicher{res?.ranking ? ` · Zuverlässigkeit ${Math.round(res.ranking.confidence * 100)}/100` : ""}</p>
+              <p className="text-[16px] font-semibold">Noch nicht eindeutig – eine Angabe hilft</p>
               <p className="text-[15px] leading-[21px] text-vx-text">{question.reason}</p>
             </div>
           </div>
@@ -717,12 +737,34 @@ export default function Home() {
                   <button onClick={() => showCandidate(best.id)} className="flex-none font-semibold text-vx-red underline underline-offset-2">Zurück</button>
                 </div>
               ) : (<>
-              <div className="mt-4 flex justify-between text-[14px]">
-                <span className="text-vx-muted">Zuverlässigkeit</span>
-                <span className="font-semibold">{LEVEL[res.ranking.level].text} · {Math.round(res.ranking.confidence * 100)}/100</span>
-              </div>
-              <div className="mt-1.5 h-1.5 w-full bg-[#ececec]"><div className="h-1.5 bg-vx-red" style={{ width: `${res.ranking.confidence * 100}%` }} /></div>
-              <p className="mt-2 text-[13px] text-vx-muted">Heuristischer Wert, keine kalibrierte Wahrscheinlichkeit. {res.ranking.reasons.join(" · ")}</p>
+              {(() => {
+                const lv = LEVEL[res.ranking.level];
+                const { good, tips } = splitReasons(res.ranking.reasons);
+                return (
+                  <div className="mt-4 border-t border-vx-line pt-4">
+                    <div className="flex items-center justify-between gap-3">
+                      <span className="text-[16px] font-semibold">{lv.text}</span>
+                      <span className="flex gap-1" aria-label={`${lv.seg} von 3`}>
+                        {[1, 2, 3].map((i) => <span key={i} className={`h-1.5 w-7 ${i <= lv.seg ? "bg-vx-green" : "bg-[#e3e3e3]"}`} />)}
+                      </span>
+                    </div>
+                    {good.length > 0 && (
+                      <ul className="mt-2.5 space-y-1">
+                        {good.map((g) => <li key={g} className="flex gap-2 text-[14px] leading-[19px] text-vx-text"><span className="flex-none text-vx-green">{Ico.check}</span>{g}</li>)}
+                      </ul>
+                    )}
+                    {tips.length > 0 && res.ranking.level !== "high" && (<>
+                      <p className="mt-3 text-[13px] font-semibold uppercase tracking-[0.08em] text-vx-muted">Noch sicherer wird es mit</p>
+                      <ul className="mt-1.5 space-y-1">
+                        {tips.map((t) => <li key={t} className="flex gap-2 text-[14px] leading-[19px] text-vx-text"><span className="flex-none text-vx-muted">→</span>{t}</li>)}
+                      </ul>
+                    </>)}
+                    <p className="mt-3 text-[12px] leading-[16px] text-vx-muted">
+                      Richtwert {Math.round(res.ranking.confidence * 100)}/100 aus dem Merkmalsabgleich mit dem Katalog – keine Wahrscheinlichkeit.
+                    </p>
+                  </div>
+                );
+              })()}
               </>)}
             </div>
           </div>
