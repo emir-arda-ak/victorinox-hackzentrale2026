@@ -318,9 +318,6 @@ export default function Home() {
             </div>
           </div>
         </Section>
-        <Section className="pt-8">
-          <p className="vx-eyebrow text-[13px]">From the makers of the original Swiss Army Knife™</p>
-        </Section>
       </>)}
 
       {/* ---------- photos + agent ---------- */}
