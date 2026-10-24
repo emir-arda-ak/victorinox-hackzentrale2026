@@ -1,0 +1,29 @@
+{
+  "status": "ok",
+  "results": [
+    {
+      "product_id": "0.6223",
+      "similarity": 0.9999996378726513
+    },
+    {
+      "product_id": "0.6223.840",
+      "similarity": 0.9999996144665445
+    },
+    {
+      "product_id": "0.6221.63",
+      "similarity": 0.9655629950969961
+    },
+    {
+      "product_id": "0.6221.90",
+      "similarity": 0.9379164559575206
+    },
+    {
+      "product_id": "0.6223.E221",
+      "similarity": 0.9309530126074589
+    }
+  ],
+  "embedding_model": "text-embedding-3-small",
+  "dimensions": 1536,
+  "data_version": "9ad03498962a1144524c97410f2fbb6cead2ec906d00a7425bbe4c440bb27e05",
+  "query_description": "Modell: CLASSIC SD\nKategorie: Taschenmesser\nGrifflänge: 58 mm\nArbeitsfunktionen: Kleine Klinge, Nagelfeile, Schere, Schraubendreher, Zahnstocher, Pinzette\nHandhabung: Ring"
+}

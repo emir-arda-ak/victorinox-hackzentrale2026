@@ -1,0 +1,40 @@
+{
+  "extraction": {
+    "category": "ONEHAND",
+    "category_confidence": 0.785,
+    "brand": "Böker",
+    "brand_evidence": null,
+    "is_victorinox": false,
+    "model_guess": null,
+    "visible_sku": null,
+    "open_state": "open",
+    "tools_seen": [
+      "blade_large",
+      "clip",
+      "corkscrew",
+      "scissors"
+    ],
+    "tools_maybe": [
+      "other",
+      "saw_wood"
+    ],
+    "sheet_visible": true,
+    "length_zone": "111",
+    "length_zone_alt": null,
+    "length_zone_confidence": 0.78,
+    "length_estimate_mm": 102.5,
+    "scale_color": "schwarz",
+    "scale_material": "Andere",
+    "description": "",
+    "image_issues": []
+  },
+  "answers": {
+    "tools_yes": [
+      "thumb_stud"
+    ],
+    "tools_no": [],
+    "length_zone": null,
+    "category": null,
+    "rounds": 0
+  }
+}

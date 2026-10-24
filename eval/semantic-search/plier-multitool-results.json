@@ -1,0 +1,29 @@
+{
+  "status": "ok",
+  "results": [
+    {
+      "product_id": "3.0323.L",
+      "similarity": 0.9192600382861678
+    },
+    {
+      "product_id": "3.0326.M3N",
+      "similarity": 0.907752864859095
+    },
+    {
+      "product_id": "3.0323.3CN",
+      "similarity": 0.9039143267491936
+    },
+    {
+      "product_id": "3.0327.MN",
+      "similarity": 0.8983151622259449
+    },
+    {
+      "product_id": "3.0327.L",
+      "similarity": 0.8952382029280741
+    }
+  ],
+  "embedding_model": "text-embedding-3-small",
+  "dimensions": 1536,
+  "data_version": "9ad03498962a1144524c97410f2fbb6cead2ec906d00a7425bbe4c440bb27e05",
+  "query_description": "Modell: unbekannt\nKategorie: Zangen-Multitool\nGrifflänge: unbekannt\nArbeitsfunktionen: Ahle, Grosse Klinge, Klinge mit Wellenschliff, Kapselheber, Dosenöffner, Holzmeissel, Kupplung für Korkenzieher, Kistenöffner, Hülsenpresser, Kreuzschlitz-Schraubendreher, Zange, Massstab, Metallsäge / Metallfeile, Holzsäge, Schaber, Schraubendreher, Drahtbieger, Drahtschneider, Drahtabisolierer\nHandhabung: Befestigungsöse / Kordel"
+}

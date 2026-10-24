@@ -1,0 +1,26 @@
+{
+  "base_commit": "50b43ee5e986cc8060e1581fc392a309470b89d5",
+  "branch": "codex/catalog-text-embeddings",
+  "embedding_model": "text-embedding-3-small",
+  "dimensions": 1536,
+  "products": 149,
+  "description_version": "product-description-de-v2",
+  "data_version": "9ad03498962a1144524c97410f2fbb6cead2ec906d00a7425bbe4c440bb27e05",
+  "generated_at": "2026-10-24T13:51:42.977Z",
+  "artifact_sha256": "7c13eface339c2b9efc6d5b8347df6e4f86990ca99221219606bd9f31d3770fa",
+  "artifact_bytes": 4444101,
+  "catalog_sha256": "7ea7c21bdb835e2a71895db99ad4554bb52b3e13d44c16a4f40a442f9562020b",
+  "final_generation_tokens": 14262,
+  "initial_format_experiment_tokens": 20367,
+  "unchanged_regeneration": {
+    "generated": 0,
+    "reused": 149,
+    "total_tokens": 0,
+    "byte_identical": true
+  },
+  "live_query_fixtures": [
+    "competitor-example.json",
+    "identified-pocketknife.json",
+    "plier-multitool.json"
+  ]
+}

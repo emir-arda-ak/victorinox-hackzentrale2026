@@ -63,7 +63,26 @@ Verglichen werden Fotos und kombinierte Messer, getrennt nach Ground-Truth-Pfad,
 `--no-sku` ist hier der primäre Vergleich, weil der Testdatensatz ein falsch beschriftetes Classic SD enthält.
 Die Zuverlässigkeit ist eine Heuristik, keine kalibrierte Wahrscheinlichkeit. Details, Gewichte, Vorher/Nachher-Zahlen und Regressionen: [Ranking-Audit](eval/ranking-audit/report.md).
 
-## Offen für M2
+## Separate semantische Katalogsuche
+
+Für alle 149 Modelle liegen echte `text-embedding-3-small`-Vektoren mit 1536 Dimensionen in
+`data/catalog-embeddings.json` vor. Die exakte Cosine-Suche ist ein separater Testpfad und verändert die bisherige Rangliste nicht.
+
+```bash
+npm run embeddings:check                    # Offline: IDs, Version, Vollständigkeit, Dimensionen
+npm run test:embeddings                     # Offline-Tests, keine API-Aufrufe
+npm run embeddings:generate -- --dry-run    # Beschreibungen/Datenversion prüfen, keine API-Aufrufe
+npm run embeddings:generate                 # Nur fehlende/geänderte Vektoren erzeugen
+npm run embeddings:search -- --extraction eval/semantic-search/competitor-example.json --k 5
+```
+
+`OPENAI_API_KEY` kommt ausschliesslich aus der Umgebung bzw. den ignorierten `.env`-/`.env.local`-Dateien.
+Der zusätzliche HTTP-Endpunkt `POST /api/semantic-search` ist standardmässig deaktiviert; für Tests
+`SEMANTIC_SEARCH_ENABLED=1` setzen. CLI-Suchaufrufe sind explizit und benötigen diesen Schalter nicht.
+
+[Format, Aktualisierung, API und Fallback](docs/semantic-search.md) · [Testbericht und Einschränkungen](eval/semantic-search/report.md)
+
+## Weitere Arbeiten
 
 - [ ] Feedback 👍/👎 + gelernte Regeln (Redis via Vercel Marketplace) → `score(…, learned)` ist vorbereitet
 - [ ] Korrigierbare Chips (Werkzeuge an/aus → `/api/score`)

@@ -1,0 +1,32 @@
+{
+  "extraction": {
+    "category": "SAK",
+    "category_confidence": 0.95,
+    "brand": "Victorinox",
+    "brand_evidence": null,
+    "is_victorinox": true,
+    "model_guess": "CLASSIC SD",
+    "visible_sku": null,
+    "open_state": "open",
+    "tools_seen": [
+      "blade_small",
+      "key_ring",
+      "nail_file",
+      "scissors",
+      "toothpick",
+      "tweezers",
+      "screwdriver"
+    ],
+    "tools_maybe": [],
+    "sheet_visible": false,
+    "length_zone": null,
+    "length_zone_alt": null,
+    "length_zone_confidence": 0,
+    "length_estimate_mm": 58,
+    "scale_color": null,
+    "scale_material": null,
+    "description": "",
+    "image_issues": []
+  },
+  "answers": {}
+}

@@ -1,0 +1,29 @@
+{
+  "status": "ok",
+  "results": [
+    {
+      "product_id": "0.9411.M3",
+      "similarity": 0.8098605848203984
+    },
+    {
+      "product_id": "0.9415.D630",
+      "similarity": 0.8057014849239813
+    },
+    {
+      "product_id": "0.7052.T",
+      "similarity": 0.8024302589060893
+    },
+    {
+      "product_id": "0.8583",
+      "similarity": 0.7986722018274589
+    },
+    {
+      "product_id": "8.2050.B1",
+      "similarity": 0.7982229716009461
+    }
+  ],
+  "embedding_model": "text-embedding-3-small",
+  "dimensions": 1536,
+  "data_version": "9ad03498962a1144524c97410f2fbb6cead2ec906d00a7425bbe4c440bb27e05",
+  "query_description": "Modell: unbekannt\nKategorie: Einhand-Klappmesser\nGrifflänge: 102.5 mm\nArbeitsfunktionen: Grosse Klinge, Korkenzieher, Schere\nHandhabung: Trageclip, Daumenpin (Einhandöffnung)\nUnsichere Arbeitsfunktionen: Holzsäge"
+}
