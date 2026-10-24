@@ -143,6 +143,20 @@ const Ico = {
   code: <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="m16 18 6-6-6-6M8 6l-6 6 6 6" /></svg>,
 };
 
+/** one accordion style for the whole app: hairline separators, 52 px header, same label style, even content padding.
+ *  Adjacent accordions share their separator (border-t only on the first in a stack). */
+function Accordion({ title, open, children }: { title: React.ReactNode; open?: boolean; children: React.ReactNode }) {
+  return (
+    <details open={open} className="group border-b border-vx-line first:border-t">
+      <summary className="flex min-h-[52px] cursor-pointer list-none items-center justify-between gap-3 py-3 [&::-webkit-details-marker]:hidden">
+        <span className="vx-section">{title}</span>
+        <span className="flex-none rotate-90 text-vx-muted transition-transform duration-200 group-open:-rotate-90">{Ico.chevron}</span>
+      </summary>
+      <div className="pb-5 pt-1">{children}</div>
+    </details>
+  );
+}
+
 const Section = ({ children, className = "" }: { children: React.ReactNode; className?: string }) => (
   <section className={`px-5 pt-6 ${className}`}>{children}</section>
 );
@@ -432,37 +446,29 @@ export default function Home() {
       {stage !== "review" && (<>
       {/* ---------- photos + agent ---------- */}
       {stage !== "start" && (<>
-        {photos.length > 0 && (
+        {working && steps.length > 0 && (
           <Section className="pt-5">
-            <details className="group">
-              <summary className="flex cursor-pointer list-none items-center justify-between border-y border-vx-line py-3">
-                <span className="vx-section">Eingabe-Fotos · {photos.length}</span>
-                <span className="rotate-90 transition group-open:-rotate-90">{Ico.chevron}</span>
-              </summary>
-              <div className="mt-3 flex gap-2 overflow-x-auto">
-                {photos.map((p, i) => (
-                  // eslint-disable-next-line @next/next/no-img-element
-                  <img key={i} src={p} alt={`Foto ${i + 1}`}
-                    className={`size-16 flex-none border border-vx-border object-cover ${working && i >= extractions.length ? "animate-pulse opacity-60" : ""}`} />
-                ))}
-              </div>
-            </details>
+            <p className="vx-eyebrow">Agent arbeitet</p>
+            <h2 className="vx-h1 mt-1 text-[28px] leading-[30px]">{busy}</h2>
+            <div className="mt-3 h-1 w-full bg-[#ececec]"><div className="h-1 bg-vx-red transition-all duration-500" style={{ width: `${progress * 100}%` }} /></div>
           </Section>
         )}
-
-        {steps.length > 0 && (
-          <Section>
-            {working ? (<>
-              <p className="vx-eyebrow">Agent arbeitet</p>
-              <h2 className="vx-h1 mt-1 text-[28px] leading-[30px]">{busy}</h2>
-              <div className="mt-3 h-1 w-full bg-[#ececec]"><div className="h-1 bg-vx-red transition-all duration-500" style={{ width: `${progress * 100}%` }} /></div>
-            </>) : null}
-            <details open={working} className="group mt-3">
-              <summary className="flex cursor-pointer list-none items-center justify-between border-y border-vx-line py-3">
-                <span className="vx-section">Agent-Schritte · {steps.length}{res?.agent_checks?.length ? ` · ${res.agent_checks.length} Selbstprüfung${res.agent_checks.length > 1 ? "en" : ""}` : ""}</span>
-                <span className="rotate-90 transition group-open:-rotate-90">{Ico.chevron}</span>
-              </summary>
-              <ul className="mt-1">
+        {(photos.length > 0 || steps.length > 0) && (
+          <Section className="pt-5">
+            {photos.length > 0 && (
+              <Accordion title={`Eingabe-Fotos · ${photos.length}`}>
+                <div className="flex gap-2 overflow-x-auto">
+                  {photos.map((p, i) => (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img key={i} src={p} alt={`Foto ${i + 1}`}
+                      className={`size-16 flex-none border border-vx-border object-cover ${working && i >= extractions.length ? "animate-pulse opacity-60" : ""}`} />
+                  ))}
+                </div>
+              </Accordion>
+            )}
+            {steps.length > 0 && (
+              <Accordion open={working} title={`Agent-Schritte · ${steps.length}${res?.agent_checks?.length ? ` · ${res.agent_checks.length} Selbstprüfung${res.agent_checks.length > 1 ? "en" : ""}` : ""}`}>
+              <ul className="-mt-1">
                 {AGENTS.map((a) => {
                   const mine = steps.filter((s) => s.agent === a.name);
                   const last = mine[mine.length - 1];
@@ -483,7 +489,7 @@ export default function Home() {
                   );
                 })}
               </ul>
-              <details className="group/log mt-1">
+              <details className="mt-2">
                 <summary className="cursor-pointer list-none py-2 text-[14px] text-vx-muted underline underline-offset-2">Protokoll anzeigen ({steps.length} Schritte)</summary>
                 <ol className="mt-1 space-y-2 border-l border-vx-line pl-4">
                   {steps.map((s) => (
@@ -493,7 +499,8 @@ export default function Home() {
                   ))}
                 </ol>
               </details>
-            </details>
+              </Accordion>
+            )}
           </Section>
         )}
         {error && <Section><p className="border-l-[3px] border-vx-red bg-vx-panel p-3 text-[15px]">{error}</p></Section>}
@@ -528,12 +535,9 @@ export default function Home() {
             <button onClick={() => camRef.current?.click()} disabled={working} className="vx-btn vx-btn-outline h-[46px] text-[16px]">{Ico.camera} Weiteres Foto</button>
             <button onClick={() => galleryRef.current?.click()} disabled={working} className="vx-btn vx-btn-outline h-[46px] text-[16px]">{Ico.image} Galerie</button>
           </div>
-          <details className="group mt-3">
-            <summary className="flex cursor-pointer list-none items-center justify-between border-y border-vx-line py-3">
-              <span className="text-[16px] font-semibold">Erkannte Merkmale korrigieren</span>
-              <span className="rotate-90 transition group-open:-rotate-90">{Ico.chevron}</span>
-            </summary>
-            <p className="mt-3 font-cond text-[14px] font-semibold uppercase tracking-[0.1em] text-vx-muted">Kategorie</p>
+          <div className="mt-4">
+          <Accordion title="Merkmale korrigieren">
+            <p className="font-cond text-[14px] font-semibold uppercase tracking-[0.1em] text-vx-muted">Kategorie</p>
             <div className="mt-1.5 flex flex-wrap gap-2">
               {Object.entries(CATEGORIES).filter(([k]) => ["SAK", "MULTITOOL", "ONEHAND"].includes(k) || k === ex.category).map(([k, v]) => (
                 <Chip key={k} on={(answers.category ?? ex.category) === k} onClick={() => rescore({ ...answers, category: k as Answers["category"] })}>{v}</Chip>
@@ -558,7 +562,8 @@ export default function Home() {
                 {TOOL_IDS.filter((t) => !shownTools.includes(t)).map((t) => <option key={t} value={t}>{TOOL_LABEL[t].label}</option>)}
               </select>
             )}
-          </details>
+          </Accordion>
+          </div>
         </Section>
       )}
 
@@ -741,11 +746,10 @@ export default function Home() {
 
       {res && (
         <Section>
-          <details className="group border-y border-vx-line">
-            <summary className="flex cursor-pointer list-none items-center gap-3.5 py-3"><span>{Ico.code}</span><span className="flex-1 text-[16px] font-semibold">Agent-Details & Quellen</span><span className="rotate-90 transition group-open:-rotate-90">{Ico.chevron}</span></summary>
+          <Accordion title="Agent-Details & Quellen">
             <p className="text-[12px] text-vx-muted">{res.model ?? "?"} · Prompt {res.prompt_version ?? "?"} · {JSON.stringify(res.timings)}</p>
             <pre className="mt-2 overflow-x-auto bg-vx-ink p-3 text-[11px] text-white">{JSON.stringify({ answers, extraction: res.extraction, ranking: res.ranking?.candidates.slice(0, 5).map((c) => ({ id: c.id, score: c.score, parts: c.parts })) }, null, 1)}</pre>
-          </details>
+          </Accordion>
         </Section>
       )}
       </>)}
