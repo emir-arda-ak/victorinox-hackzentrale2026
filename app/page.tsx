@@ -181,6 +181,8 @@ export default function Home() {
   const [pending, setPending] = useState<{ src: string; q: Quality }[]>([]);
   const [pendingAdd, setPendingAdd] = useState(false);
   const [sel, setSel] = useState(0);
+  const [agentRun, setAgentRun] = useState(false); // an agent request is in flight (upload + stream)
+  const [fbSending, setFbSending] = useState(false);
 
   function reset() {
     setPhotos([]); setExtractions([]); setRes(null); setAnswers(EMPTY); setError(null); setFb("idle"); setFbMsg(null); setAddTool(false); setSteps([]);
@@ -224,12 +226,12 @@ export default function Home() {
     const prevEx = add ? extractions : [];
     if (!add) reset();
     setPending([]);
-    setBusy("Agent arbeitet …");
+    setAgentRun(true);
+    setBusy("Fotos werden hochgeladen …");
     try {
       const all = [...prevPhotos, ...imgs];
       setPhotos(all);
       setSteps([]);
-      setBusy("Agent arbeitet …");
       const r = await fetch("/api/agent", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -274,6 +276,7 @@ export default function Home() {
       if (!add) setPhotos([]);
       else setPhotos(prevPhotos);
     } finally {
+      setAgentRun(false);
       setBusy(null);
       if (camRef.current) camRef.current.value = "";
       if (galleryRef.current) galleryRef.current.value = "";
@@ -307,6 +310,7 @@ export default function Home() {
   // ----- feedback -----
   async function sendFeedback(chosen: string, correct: boolean) {
     const suggested = res?.ranking?.candidates[0]?.id ?? null;
+    setFbSending(true);
     try {
       const j = await postJson<{ persistent: boolean }>("/api/feedback", { extractions, suggested, chosen, correct });
       setFb("done");
@@ -315,6 +319,8 @@ export default function Home() {
       if (!correct) rescore(answers);
     } catch (e) {
       setError(e instanceof Error ? e.message : String(e));
+    } finally {
+      setFbSending(false);
     }
   }
   async function search(v: string) {
@@ -352,6 +358,7 @@ export default function Home() {
             <button onClick={() => (stage === "review" ? setPending([]) : reset())} disabled={working} aria-label={stage === "review" ? "Abbrechen" : "Neues Messer"} className="flex size-10 items-center justify-center disabled:opacity-40">{Ico.close}</button>
           </div>
         )}
+        {working && <div className="vx-indet absolute inset-x-0 -bottom-px h-[3px]" role="progressbar" aria-label="Lädt" />}
       </header>
 
       {/* ---------- start ---------- */}
@@ -371,8 +378,10 @@ export default function Home() {
             onDragLeave={() => setDrag(false)}
             onDrop={(e) => { e.preventDefault(); setDrag(false); onFiles(e.dataTransfer.files, false); }}
             className={`mt-6 flex flex-col gap-3 ${drag ? "outline-2 outline-offset-4 outline-vx-red" : ""}`}>
-            <button onClick={() => camRef.current?.click()} className="vx-btn vx-btn-primary">{Ico.camera} Foto aufnehmen</button>
-            <button onClick={() => galleryRef.current?.click()} className="vx-btn vx-btn-outline">{Ico.image} Aus Galerie wählen</button>
+            <button onClick={() => camRef.current?.click()} disabled={working} className="vx-btn vx-btn-primary">
+              {working ? <><span className="vx-spinner" /> {busy}</> : <>{Ico.camera} Foto aufnehmen</>}
+            </button>
+            <button onClick={() => galleryRef.current?.click()} disabled={working} className="vx-btn vx-btn-outline">{Ico.image} Aus Galerie wählen</button>
             <p className="hidden text-center text-[14px] text-vx-muted md:block">… oder mehrere Bilder hierher ziehen</p>
           </div>
           {error && <p className="mt-4 border-l-[3px] border-vx-red bg-vx-panel p-3 text-[15px]">{error}</p>}
@@ -415,37 +424,41 @@ export default function Home() {
                   className="absolute -right-1.5 -top-1.5 flex size-[18px] items-center justify-center rounded-full border border-[#464646] bg-white text-[11px] leading-none">✕</button>
               </div>
             ))}
-            {pending.length + (pendingAdd ? photos.length : 0) < MAX_PHOTOS && ["Rückseite", "Logo / Nr."].map((label) => (
-              <button key={label} onClick={() => galleryRef.current?.click()}
-                className="flex size-[84px] flex-none flex-col items-center justify-center gap-1 border border-dashed border-[#bbb] bg-white text-vx-muted">
-                <span className="text-[22px] leading-none">＋</span><span className="text-[12px]">{label}</span>
-              </button>
-            ))}
           </div>
         </Section>
+        {(!cur.q.sharp || cur.q.exposure !== "ok") && (
+          <Section className="pt-4">
+            <div className="flex gap-3 border-l-[3px] border-[#d4a017] bg-[#fdf6e3] p-4">
+              <span className="text-[#8a6100]">{Ico.warn}</span>
+              <p className="text-[15px] leading-[21px]">
+                <span className="font-semibold">{pending.length > 1 ? `Foto ${sel + 1}: ` : ""}{!cur.q.sharp ? "Wirkt unscharf" : cur.q.exposure === "dark" ? "Ziemlich dunkel" : "Stark überbelichtet"}.</span>{" "}
+                Ein schärferes, gut beleuchtetes Foto erhöht die Trefferquote – Sie können aber trotzdem analysieren.
+              </p>
+            </div>
+          </Section>
+        )}
         <Section>
-          <p className="vx-section">Bildqualität{pending.length > 1 ? ` · Foto ${sel + 1}` : ""}</p>
-          <ul className="mt-3">
+          <p className="vx-section">Tipps für gute Fotos</p>
+          <ol className="mt-3 space-y-3">
             {[
-              { ok: cur.q.sharp, auto: true, text: cur.q.sharp ? "Bild scharf" : "Bild wirkt unscharf – besser neu aufnehmen" },
-              { ok: cur.q.exposure === "ok", auto: true, text: cur.q.exposure === "ok" ? "Gut belichtet" : cur.q.exposure === "dark" ? "Bild ist zu dunkel" : "Bild ist überbelichtet" },
-              { ok: null, auto: false, text: "Messunterlage mit rotem Startbalken im Bild – Länge messbar" },
-              { ok: null, auto: false, text: "Werkzeuge aufgeklappt und sichtbar" },
-              { ok: null, auto: false, text: "Logo / Artikelnummer optional – erhöht die Trefferquote" },
-            ].map((it) => (
-              <li key={it.text} className="flex items-center gap-3 py-[9px]">
-                <span className={`flex size-6 flex-none items-center justify-center rounded-full text-[13px] ${it.ok === true ? "bg-vx-green text-white" : it.ok === false ? "bg-[#d4a017] text-white" : "bg-[#ededed] text-vx-muted"}`}>
-                  {it.ok === true ? "✓" : it.ok === false ? "!" : "–"}
-                </span>
-                <span className={`text-[16px] ${it.auto ? "text-vx-ink" : "text-vx-muted"}`}>{it.text}</span>
+              ["Messunterlage nutzen", "Griffende bündig an den roten Startbalken – so misst der Agent die Länge."],
+              ["Werkzeuge aufklappen", "Pro Foto andere Werkzeuge zeigen; mehrere Fotos ergänzen sich."],
+              ["Senkrecht von oben", "Gutes Licht, keine Schatten über der Skala."],
+              ["Logo oder Artikelnummer", "Optional – ein Foto davon erhöht die Trefferquote."],
+            ].map(([t, d], i) => (
+              <li key={t} className="flex gap-3">
+                <span className="flex size-6 flex-none items-center justify-center bg-vx-panel font-cond text-[14px] font-semibold text-vx-red">{i + 1}</span>
+                <span className="text-[15px] leading-[21px]"><span className="font-semibold">{t}.</span> <span className="text-vx-text">{d}</span></span>
               </li>
             ))}
-          </ul>
-          <p className="mt-1 text-[13px] text-vx-muted">Schärfe und Belichtung prüft die App direkt; die übrigen Punkte bitte selbst kontrollieren.</p>
+          </ol>
         </Section>
         <Section className="flex flex-col gap-3">
           <button onClick={analyze} className="vx-btn vx-btn-primary">Analysieren{pending.length > 1 ? ` (${pending.length} Fotos)` : ""}</button>
-          <button onClick={() => { setPending([]); camRef.current?.click(); }} className="vx-btn vx-btn-outline">{Ico.camera} Neu aufnehmen</button>
+          {pending.length + (pendingAdd ? photos.length : 0) < MAX_PHOTOS && (<>
+            <button onClick={() => camRef.current?.click()} className="vx-btn vx-btn-outline">{Ico.camera} Foto hinzufügen</button>
+            <button onClick={() => galleryRef.current?.click()} className="text-center text-[15px] text-vx-muted underline underline-offset-2">oder aus der Galerie hinzufügen</button>
+          </>)}
         </Section>
         {error && <Section><p className="border-l-[3px] border-vx-red bg-vx-panel p-3 text-[15px]">{error}</p></Section>}
       </>)}
@@ -453,11 +466,14 @@ export default function Home() {
       {stage !== "review" && (<>
       {/* ---------- photos + agent ---------- */}
       {stage !== "start" && (<>
-        {working && steps.length > 0 && (
-          <Section className="pt-5">
+        {agentRun && (
+          <Section className="pt-5" >
             <p className="vx-eyebrow">Agent arbeitet</p>
-            <h2 className="vx-h1 mt-1 text-[28px] leading-[30px]">{busy}</h2>
-            <div className="mt-3 h-1 w-full bg-[#ececec]"><div className="h-1 bg-vx-red transition-all duration-500" style={{ width: `${progress * 100}%` }} /></div>
+            <h2 className="vx-h1 mt-1 text-[28px] leading-[30px]" aria-live="polite">{busy}</h2>
+            {steps.length
+              ? <div className="mt-3 h-1 w-full bg-[#ececec]"><div className="h-1 bg-vx-red transition-all duration-500" style={{ width: `${progress * 100}%` }} /></div>
+              : <div className="vx-indet relative mt-3 h-1 w-full" />}
+            {!steps.length && <p className="mt-2 text-[14px] text-vx-muted">Bei langsamer Verbindung kann das Hochladen einige Sekunden dauern.</p>}
           </Section>
         )}
         {(photos.length > 0 || steps.length > 0) && (
@@ -609,7 +625,6 @@ export default function Home() {
               <button className="h-[46px] border-l border-vx-ink font-cond text-[16px] font-semibold uppercase" onClick={() => rescore({ ...answers, rounds: answers.rounds + 1 })}>Weiss nicht</button>
             </div>
           )}
-          <button className="mt-4 w-full text-center text-[15px] text-vx-muted underline" onClick={() => rescore({ ...answers, rounds: answers.rounds + 1 })}>Trotzdem Ergebnis anzeigen</button>
         </Section>
       )}
 
@@ -711,9 +726,9 @@ export default function Home() {
               <p className="mt-0.5 text-[14px] text-vx-muted">Ihr Feedback verbessert den Agenten laufend.</p>
             </>)}
             {fb === "idle" && (
-              <div className="mt-3.5 grid grid-cols-2 gap-2.5">
-                <button className="vx-btn vx-btn-outline h-[46px] text-[16px]" onClick={() => sendFeedback(best.id, true)}>{Ico.thumbUp} Korrekt</button>
-                <button className="vx-btn vx-btn-outline h-[46px] text-[16px]" onClick={() => setFb("pick")}>{Ico.thumbDown} Nicht korrekt</button>
+              <div className="mt-3.5 grid grid-cols-[1fr_1.3fr] gap-2.5">
+                <button disabled={fbSending} className="vx-btn vx-btn-outline h-[46px] gap-2 px-3 text-[16px]" onClick={() => sendFeedback(best.id, true)}>{fbSending ? <span className="vx-spinner" /> : Ico.thumbUp} Korrekt</button>
+                <button disabled={fbSending} className="vx-btn vx-btn-outline h-[46px] gap-2 px-3 text-[16px]" onClick={() => setFb("pick")}>{Ico.thumbDown} Nicht korrekt</button>
               </div>
             )}
             {fb === "pick" && (
