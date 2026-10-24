@@ -12,9 +12,9 @@ export async function POST(req: Request) {
     const image: unknown = body?.image;
     if (typeof image !== "string" || !(image.startsWith("data:image/") || image.startsWith("https://")))
       return NextResponse.json({ error: "image (data URL) fehlt" }, { status: 400 });
-    const { extraction, ms, model } = await extract(image);
+    const { extraction, ms, model, prompt_version } = await extract(image);
     const result = decide(extraction, AnswersSchema.parse({}), [], { extract_ms: ms });
-    return NextResponse.json({ ...result, model });
+    return NextResponse.json({ ...result, model, prompt_version, reasoning_effort: process.env.OPENAI_REASONING_EFFORT ?? null });
   } catch (e) {
     console.error(e);
     return NextResponse.json({ error: e instanceof Error ? e.message : String(e) }, { status: 500 });

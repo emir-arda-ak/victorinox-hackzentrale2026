@@ -27,6 +27,8 @@ const toolList = Object.entries(TOOL_META)
   .map(([id, m]) => `- ${id}: ${m.label}${HINTS[id] ? ` — ${HINTS[id]}` : ""}`)
   .join("\n");
 
+export const PROMPT_VERSION = "v3-2026-10-24-0935";
+
 export const EXTRACTION_PROMPT = `You analyse a photo of a pocket knife or multitool for a Victorinox product-matching tool used by sales staff.
 Return ONLY facts you can see. Never guess specifications.
 
@@ -38,7 +40,8 @@ Return ONLY facts you can see. Never guess specifications.
 2. Brand – be strict:
    - is_victorinox = true ONLY if you clearly see the Victorinox emblem (white cross INSIDE A SHIELD outline) or readable text VICTORINOX or WENGER.
    - A plain cross WITHOUT a shield outline (e.g. a cross in a circle or square, a cross on a red handle) is used by other brands such as Swiza and souvenir knives. In that case set brand to the readable text or null and is_victorinox to null (or false if another brand is readable).
-   - Put what you actually saw into brand_evidence.
+   - Read text stamped on the blade tang or printed on the handle letter by letter (e.g. SWIZA, WENGER, VICTORINOX, LEATHERMAN, GERBER, BÖKER, SPYDERCO). Only report a brand whose letters you can actually read or whose emblem you clearly see; never infer a brand from a red handle with a cross alone.
+   - Put exactly what you saw into brand_evidence (e.g. "Text SWIZA auf der Klinge", "Kreuz im Kreis, kein Schild").
 
 3. Tools – map every tool to this vocabulary (ids). Clearly visible tools go into tools_seen, unclear ones into tools_maybe. Folded-in tools that are not visible must NOT be listed.
 ${toolList}

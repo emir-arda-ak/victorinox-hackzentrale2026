@@ -1,7 +1,7 @@
 import OpenAI from "openai";
 import { zodTextFormat } from "openai/helpers/zod";
 import { ExtractionSchema, type Extraction } from "./schema";
-import { EXTRACTION_PROMPT } from "./prompt";
+import { EXTRACTION_PROMPT, PROMPT_VERSION } from "./prompt";
 
 let client: OpenAI | null = null;
 /** Provider switch: set AZURE_OPENAI_ENDPOINT + AZURE_OPENAI_API_KEY to run the same code on Azure OpenAI. */
@@ -21,7 +21,7 @@ function getClient(): OpenAI {
 export const VISION_MODEL = process.env.OPENAI_VISION_MODEL ?? "gpt-6-luna";
 
 /** One vision call: photo (data URL or https URL) -> structured extraction */
-export async function extract(imageUrl: string): Promise<{ extraction: Extraction; ms: number; model: string }> {
+export async function extract(imageUrl: string): Promise<{ extraction: Extraction; ms: number; model: string; prompt_version: string }> {
   const t0 = Date.now();
   const effort = process.env.OPENAI_REASONING_EFFORT as "none" | "minimal" | "low" | "medium" | "high" | undefined;
   const res = await getClient().responses.parse({
@@ -40,5 +40,5 @@ export async function extract(imageUrl: string): Promise<{ extraction: Extractio
     text: { format: zodTextFormat(ExtractionSchema, "extraction") },
   });
   if (!res.output_parsed) throw new Error("Vision model returned no parsable output");
-  return { extraction: res.output_parsed, ms: Date.now() - t0, model: VISION_MODEL };
+  return { extraction: res.output_parsed, ms: Date.now() - t0, model: VISION_MODEL, prompt_version: PROMPT_VERSION };
 }

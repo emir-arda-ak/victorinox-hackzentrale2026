@@ -123,6 +123,9 @@ for i, (rel, knife, r) in enumerate(items, 1):
             res = post("/api/score", {"extraction": json.loads(cf.read_text())})
         else:
             res = post("/api/match", {"image": data_url(root / rel)})
+            if i == 1 or not globals().get("_ver_shown"):
+                print(f"   API: Modell={res.get('model')} Prompt={res.get('prompt_version', 'ALT (ohne Version)')} Reasoning={res.get('reasoning_effort')}")
+                globals()["_ver_shown"] = True
             if res.get("extraction"):
                 cf.write_text(json.dumps(res["extraction"], ensure_ascii=False, indent=1))
     except Exception as e:
