@@ -21,7 +21,7 @@ export const ExtractionSchema = z.object({
   length_zone: ZONE.nullable().describe("Zone label under the end of the handle on the measuring sheet; null without sheet"),
   length_zone_alt: ZONE.nullable().describe("Neighbouring zone if the handle ends within ~2 mm of a boundary, else null"),
   length_zone_confidence: z.number().describe("0..1, 0 if no sheet"),
-  length_estimate_mm: z.number().nullable().describe("Rough handle length in mm if no sheet is visible (use known objects for scale), else null"),
+  length_estimate_mm: z.number().nullable().describe("Handle length in mm: read from the mm ruler when the measuring sheet is visible, otherwise a rough estimate from a reference object, else null"),
   scale_color: z.string().nullable().describe("Colour of the handle scales in German, e.g. rot, schwarz, silber, blau"),
   scale_material: z.enum(["Cellidor", "Alox", "Holz", "Grip", "Metall", "Kunststoff", "Andere"]).nullable(),
   description: z.string().describe("One or two sentences in German describing the knife and its visible tools"),

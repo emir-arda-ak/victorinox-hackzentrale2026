@@ -1,20 +1,55 @@
 import { TOOL_META } from "@/lib/catalog";
 
+/** visual hints for the tools that are most often confused on photos */
+const HINTS: Record<string, string> = {
+  blade_large: "main cutting blade, long, one sharp edge",
+  blade_small: "second, clearly shorter cutting blade",
+  awl: "thin pointed spike (round or triangular, often with a sewing eye) WITHOUT a cutting edge – not a blade",
+  corkscrew: "metal spiral",
+  can_opener: "short hooked tool with a sharp curved point and a small flat screwdriver tip",
+  bottle_opener: "flat lever with a hook/notch for crown caps, flat screwdriver tip at its end",
+  screwdriver: "separate flat-tip screwdriver blade (not the tip of the bottle/can opener)",
+  phillips: "cross-head screwdriver tip",
+  scissors: "two small blades with a spring",
+  saw_wood: "blade with coarse teeth",
+  saw_metal: "file/blade with fine teeth or a file surface",
+  hook: "multi-purpose hook (curved, blunt)",
+  pliers: "plier jaws",
+  magnifier: "small lens",
+  nail_file: "flat file with a fine cross pattern, often with a nail-cleaner tip",
+  key_ring: "metal ring at the end of the handle",
+  tweezers: "tweezers stuck in the handle scale",
+  toothpick: "plastic toothpick stuck in the handle scale",
+};
+
 const toolList = Object.entries(TOOL_META)
   .filter(([id]) => id !== "other")
-  .map(([id, m]) => `- ${id}: ${m.label}`)
+  .map(([id, m]) => `- ${id}: ${m.label}${HINTS[id] ? ` — ${HINTS[id]}` : ""}`)
   .join("\n");
 
 export const EXTRACTION_PROMPT = `You analyse a photo of a pocket knife or multitool for a Victorinox product-matching tool used by sales staff.
 Return ONLY facts you can see. Never guess specifications.
 
-1. Category: classic Swiss-Army-style multi-blade knife (SAK), plier-based multitool (MULTITOOL), single-blade folding knife (ONEHAND), credit-card tool (SWISSCARD), fixed blade (FIXED), garden/pruning knife (GARDEN), other knife (OTHER_KNIFE), or not a knife at all (NOT_A_KNIFE).
-2. Brand: read logos and engravings. Victorinox uses a cross inside a shield; knives branded Wenger are also made by Victorinox (is_victorinox = true). If you cannot read the brand, use null.
-3. Tools: map every tool to this vocabulary (ids). Put clearly visible tools in tools_seen, unclear ones in tools_maybe. A tool that is folded in and not visible must NOT be listed in tools_seen.
-${toolList}
-Notes: tweezers, toothpick, pin and pen sit inside the scales and are often hidden. A bottle opener usually carries a flat screwdriver tip (list bottle_opener, and screwdriver only if a separate screwdriver blade exists).
+1. Category – judge the WHOLE object, not the opened tool:
+   - SAK: classic multi-tool pocket knife with several tools folded into the handle (thick handle with several layers). It stays SAK even if only one blade or tool is opened on the photo.
+   - ONEHAND: single-blade folding knife with one-hand opening (thumb stud/hole) or pocket clip and NO other tools in the handle.
+   - MULTITOOL: plier-based tool. SWISSCARD: credit-card tool. FIXED: fixed blade. GARDEN: garden/pruning knife. OTHER_KNIFE / NOT_A_KNIFE.
 
-4. Length via measuring sheet: if the knife lies on the printed "Product Match Messunterlage" (red start bar on the left, grey zone band with large numbers under a black rail), the butt end of the handle touches the red bar. Find where the OTHER end of the handle/scales ends — ignore opened blades and tools that extend beyond it. Report the label of the zone band cell directly below that point (one of "58", "65", "84", "91/93", "100", "111", "130", "<45", ">145") as length_zone, plus length_zone_confidence (0–1). If the end is within ~2 mm of a dashed zone boundary, also report the neighbouring zone as length_zone_alt. Without a sheet, set length_zone to null and give a rough length_estimate_mm only if a reference object makes it possible.
+2. Brand – be strict:
+   - is_victorinox = true ONLY if you clearly see the Victorinox emblem (white cross INSIDE A SHIELD outline) or readable text VICTORINOX or WENGER.
+   - A plain cross WITHOUT a shield outline (e.g. a cross in a circle or square, a cross on a red handle) is used by other brands such as Swiza and souvenir knives. In that case set brand to the readable text or null and is_victorinox to null (or false if another brand is readable).
+   - Put what you actually saw into brand_evidence.
+
+3. Tools – map every tool to this vocabulary (ids). Clearly visible tools go into tools_seen, unclear ones into tools_maybe. Folded-in tools that are not visible must NOT be listed.
+${toolList}
+Tweezers, toothpick, pin and pen sit inside the scales and are often hidden.
+
+4. Length via the printed "Product Match Messunterlage" (red start bar on the LEFT, grey zone band with large numbers under a black rail, mm ruler below the band):
+   - The butt end of the handle touches the red bar. Find where the OTHER end of the HANDLE (the scales / handle body) ends.
+   - IGNORE opened blades and tools that stick out beyond the handle – their tips are NOT the end of the handle.
+   - length_zone = label of the zone band cell directly below the handle end ("58", "65", "84", "91/93", "100", "111", "130", "<45", ">145"); length_zone_confidence 0–1; if the end is within ~2 mm of a dashed boundary also give the neighbouring zone as length_zone_alt.
+   - length_estimate_mm = handle length in mm read from the mm ruler (always fill it when the sheet is visible). If the knife lies diagonally, estimate the handle length with the 10 mm grid.
+   - Without a sheet: length_zone = null, length_estimate_mm only if a reference object makes it possible.
 
 5. If an article number is visible (packaging, label), copy it to visible_sku.
 Answer in the requested JSON format. The description is in German.`;

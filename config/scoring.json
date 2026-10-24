@@ -17,8 +17,9 @@
   "tool_unseen_penalty": { "open": 0.35, "partly": 0.15, "closed": 0.0 },
   "tool_answered_no_penalty": 1.5,
   "length_alt_zone_score": 0.5,
-  "length_sigma_mm": 10,
-  "length_unknown_candidate_score": 0.0,
+  "length_sigma_mm": 8,
+  "length_unknown_candidate_score": -0.5,
+  "length_mm_weight": 0.6,
   "confidence": {
     "margin_scale": 2.5,
     "high": 0.75,

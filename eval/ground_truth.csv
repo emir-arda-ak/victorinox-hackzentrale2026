@@ -1,2 +1,16 @@
-file,expected_ids,brand,notes
-BEISPIEL_spartan_offen.jpg,1.3603,Victorinox,Beispielzeile - durch echte Testbilder ersetzen
+folder,expected_ids,brand,path,notes
+Victorinox Camper,1.3613,Victorinox,victorinox,eigenes Modell (Ordner umbenannt von M)
+Victorinox Classic SD (58mm),0.6223;0.6223.840,Victorinox,victorinox,"eigenes Modell, rot Cellidor"
+Victorinox Outrider,0.8513,Victorinox,victorinox,eigenes Modell
+Victorinox Ranger 57 M Grip,0.9583.MC,Victorinox,victorinox,"geprüft: Ranger 57 M Grip (Waidklinge + Säge), Ordner und Dateien umbenannt"
+Victorinox SwissTool,3.0327.L;3.0338.L,Victorinox,victorinox,silber mit Schere = Swiss Tool X; X Plus gleich + Bits/Korkenzieher
+Victorinox SwissTool Spirit,3.0323.L,Victorinox,victorinox,"geprüft: Werkzeugliste = klassisches Swiss Tool (Wellenschliff, Massstab, keine Schere, nicht schwarz); Ordnername sagt Spirit"
+Victorinox Hunter Pro Alox,0.9411.M3;0.9411.D20,Victorinox,eol,"nicht im Katalog 2026 -> Nachfolger Hunter Pro M, Alternative Evoke Alox (Pfad 2)"
+Böker Plus Tech-Tool Carbon 3 01BO823,1.3909;1.3909.E221;1.3909.E222;1.3909.E223;1.3703,Böker,competitor,"geprüft: 1 Klinge, Schere, Korkenzieher, Ahle, Flaschenöffner, 2 Schraubendreher, Schaber, Glasbrecher, Ring -> Companion (Style-Varianten funktional gleich), Alternative Climber"
+Gerber Gear ARMBAR DRIVE,1.7725.T;1.7775.T,Gerber,competitor,"geprüft: Armbar Drive (Schere + Bit-Halter, Klinge, Ahle, Flaschenöffner) -> Cyber Tool M, Alternative L"
+Gerber Gear Suspension Multi-Plier,3.0224.L;3.0327.L,Gerber,competitor,"Zangen-Multitool mit Schere, Säge, Wellenschliff -> Spirit X / Swiss Tool X"
+Leatherman Crater C33SX,0.8416.M3;0.8413.3;0.9411.D20,Leatherman,competitor,"geprüft: Einhandmesser 100 mm, Daumenstift, Liner-Lock, Clip, Karabiner/Kapselheber -> Sentinel M Clip; Alternativen Sentinel, Evoke Alox"
+Leatherman REV,3.0323.L;3.0224.L;3.0327.L,Leatherman,competitor,"Zangen-Multitool ohne Schere/Säge, mit Feile -> Swiss Tool (ohne Schere) oder Spirit X"
+Spyderco C94GP UK Pen Knife,0.8000.26;0.8006.20;0.8413.3,Spyderco,competitor,"geprüft: Slipjoint ohne Arretierung (UK-tauglich), eine Klinge 7,4 cm, Daumenloch, G10 schwarz -> Swiss Army 1 / Onefold Alox (ebenfalls ohne Arretierung); Alternative Sentinel (Einhand, aber arretierend)"
+Swiza Schweizer Messer D03,1.3603;1.3603.31P;1.3601.63,Swiza,competitor,"D03 ~95 mm: Klinge, Ahle, Korkenzieher, Dosen-/Kapselöffner -> Spartan"
+"The James Brand The Pike, Rosewood KN110142-00",0.8000.26;0.8006.20,The James Brand,competitor,"geprüft: Slipjoint ohne Arretierung, Zweihand-Öffnung, eine Wharncliffe-Klinge 5,8 cm, Holzgriff -> Swiss Army 1 Alox; Alternative Onefold Alox (mit Clip)"

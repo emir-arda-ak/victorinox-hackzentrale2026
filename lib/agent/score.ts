@@ -73,20 +73,34 @@ function toolScore(c: CatalogModel, ex: Extraction, ans: Answers) {
 function lengthScore(c: CatalogModel, ex: Extraction, ans: Answers): { s: number; conf: number } {
   const zoneLabel = ans.length_zone ?? ex.length_zone;
   const zoneConf = ans.length_zone ? 1 : ex.length_zone_confidence;
-  if (c.length_mm == null) return { s: SCORING.length_unknown_candidate_score, conf: 0 };
   const zone = zoneFor(zoneLabel);
+  const mm = ans.length_zone ? null : ex.length_estimate_mm;
+  const measured = !!zone?.class_mm || !!mm;
+  if (c.length_mm == null) {
+    // catalog has no length (multitools, one-hand knives, cards): neutral, but a measured SAK should not drift to them
+    const s = measured && (c.category === "SAK" || c.category === "GARDEN") ? SCORING.length_unknown_candidate_score : 0;
+    return { s, conf: measured ? Math.max(zoneConf, 0.5) : 0 };
+  }
+  const sig = SCORING.length_sigma_mm;
+  let sZone: number | null = null;
   if (zone?.class_mm) {
-    if (zone.class_mm.includes(c.length_mm)) return { s: 1, conf: zoneConf };
-    const alt = ans.length_zone ? undefined : zoneFor(ex.length_zone_alt);
-    if (alt?.class_mm?.includes(c.length_mm)) return { s: SCORING.length_alt_zone_score, conf: zoneConf };
-    const center = (zone.from + zone.to) / 2;
-    const d = Math.abs(c.length_mm - center) / SCORING.length_sigma_mm;
-    return { s: Math.max(-1, 1 - d), conf: zoneConf };
+    if (zone.class_mm.includes(c.length_mm)) sZone = 1;
+    else if (!ans.length_zone && zoneFor(ex.length_zone_alt)?.class_mm?.includes(c.length_mm)) sZone = SCORING.length_alt_zone_score;
+    else {
+      // distance to the zone interval, not to its centre
+      const d = Math.max(0, zone.from - c.length_mm, c.length_mm - zone.to) / sig;
+      sZone = Math.max(-1, 1 - d);
+    }
   }
-  if (ex.length_estimate_mm) {
-    const d = Math.abs(c.length_mm - ex.length_estimate_mm) / (SCORING.length_sigma_mm * 2);
-    return { s: Math.max(-1, 1 - d), conf: 0.4 };
+  let sMm: number | null = null;
+  if (mm) {
+    const d = Math.abs(c.length_mm - mm) / (ex.sheet_visible ? sig : sig * 2);
+    sMm = Math.max(-1, 1 - d);
   }
+  if (sZone != null && sMm != null)
+    return { s: SCORING.length_mm_weight * sMm + (1 - SCORING.length_mm_weight) * sZone, conf: zoneConf };
+  if (sZone != null) return { s: sZone, conf: zoneConf };
+  if (sMm != null) return { s: sMm, conf: ex.sheet_visible ? 0.7 : 0.4 };
   return { s: 0, conf: 0 };
 }
 
