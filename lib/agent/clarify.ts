@@ -1,12 +1,46 @@
-import { byId, SCORING, TOOL_META, ZONES } from "@/lib/catalog";
+import { byId, CATALOG, SCORING, TOOL_META, ZONES } from "@/lib/catalog";
 import type { ToolId } from "@/lib/catalog.types";
 import type { Answers, Extraction } from "./schema";
 import type { Ranking } from "./score";
+import { functionalCoverageScore } from "./functional";
 
 export type Question =
   | { type: "photo_open"; text: string; reason: string }
   | { type: "length"; text: string; reason: string; options: { label: string; zone: string }[] }
   | { type: "tool"; text: string; reason: string; tool: ToolId };
+
+/** Re-check vision claims that alone force a much larger replacement. This never
+ * removes evidence: the normal verification/user-answer flow must confirm or deny it. */
+function overkillQuestion(ex: Extraction, ans: Answers, r: Ranking): Question | null {
+  if (ex.is_victorinox === true) return null;
+  const winner = byId.get(r.candidates[0]?.id);
+  if (!winner) return null;
+  const answered = new Set([...ans.tools_yes, ...ans.tools_no]);
+  const explicit = { ...ex, tools_seen: [], tools_maybe: [] };
+  const explicitFit = functionalCoverageScore(winner, explicit, ans).confirmedCoverage ?? 0;
+  const options = CATALOG.filter(c => c.category === winner.category &&
+    c.length_mm === winner.length_mm && c.function_count > 0 &&
+    winner.function_count / c.function_count >= SCORING.clarify.overkill_function_ratio)
+    .map(c => ({ c, fit: functionalCoverageScore(c, ex, ans) }))
+    .filter(({ c, fit }) => (fit.confirmedCoverage ?? 0) >= SCORING.clarify.overkill_min_coverage &&
+      fit.missing.length > 0 && fit.missing.length <= SCORING.clarify.overkill_max_missing &&
+      fit.missing.every(t => ex.tools_seen.includes(t) && !answered.has(t) && winner.tools.includes(t)) &&
+      (functionalCoverageScore(c, explicit, ans).confirmedCoverage ?? 0) >= explicitFit)
+    .sort((a, b) => (b.fit.confirmedCoverage ?? 0) - (a.fit.confirmedCoverage ?? 0) ||
+      a.c.function_count - b.c.function_count || a.c.id.localeCompare(b.c.id));
+  const alternative = options[0];
+  if (!alternative) return null;
+  // Check the most distinctive claim first; ubiquitous tools are less likely to
+  // be the reason only a large model can cover the extracted profile.
+  const frequency = (t: ToolId) => CATALOG.filter(c => c.tools.includes(t)).length;
+  const tool = [...alternative.fit.missing].sort((a, b) => frequency(a) - frequency(b) || a.localeCompare(b))[0];
+  return {
+    type: "tool", tool,
+    text: `Hat Ihr Messer wirklich: ${TOOL_META[tool].label}?`,
+    reason: `Die Bilderkennung dieses Merkmals muss bestätigt werden: ${winner.name} hat ${winner.function_count} Funktionen. ` +
+      `${alternative.c.name} mit ${alternative.c.function_count} Funktionen passt zum einfacheren Werkzeugprofil.`,
+  };
+}
 
 /** Pick the ONE follow-up question that best separates the top candidates. Computed, not LLM-generated. */
 export function clarify(ex: Extraction, ans: Answers, r: Ranking): Question | null {
@@ -18,6 +52,8 @@ export function clarify(ex: Extraction, ans: Answers, r: Ranking): Question | nu
       text: "Bitte fotografieren Sie das Messer mit aufgeklappten Werkzeugen.",
       reason: "Auf dem Foto sind die Werkzeuge eingeklappt, die Kandidaten unterscheiden sich aber darin.",
     };
+  const overkill = overkillQuestion(ex, ans, r);
+  if (overkill) return overkill;
   if (r.level === "high" || r.confidence >= SCORING.clarify.ask_below_confidence) return null;
   const top = r.candidates.slice(0, SCORING.clarify.top_k).map((c) => byId.get(c.id)!);
   if (top.length < 2) return null;

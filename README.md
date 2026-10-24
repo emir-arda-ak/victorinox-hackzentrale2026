@@ -82,6 +82,12 @@ Der zusätzliche HTTP-Endpunkt `POST /api/semantic-search` ist standardmässig d
 
 [Format, Aktualisierung, API und Fallback](docs/semantic-search.md) · [Testbericht und Einschränkungen](eval/semantic-search/report.md)
 
+## Proportionale Ersatzempfehlungen
+
+Unsichere Werkzeugmerkmale teilen sich einen kleinen Bonus; unnötiger Funktionsumfang zählt bei Ersatzempfehlungen stärker. Einzelne Vision-Merkmale, die deutlich grössere Modelle erzwingen, werden gezielt nachgeprüft.
+
+`npm run test:overkill` prüft Swiss-Champ-/XXL- und Böker-Regressionsfälle ohne API. [Änderungen, Testresultate und Grenzen](eval/overkill/report.md).
+
 ## Weitere Arbeiten
 
 - [ ] Feedback 👍/👎 + gelernte Regeln (Redis via Vercel Marketplace) → `score(…, learned)` ist vorbereitet

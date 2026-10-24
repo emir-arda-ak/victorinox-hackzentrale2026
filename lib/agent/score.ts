@@ -268,9 +268,9 @@ export function score(ex: Extraction, ans: Answers, learned: LearnedRule[] = [])
     const parts: Record<string, number> = {
       // Compatibility: tools retains legacy fit for identification; replacement uses explicit negatives only.
       tools: M.tools * (mode === "victorinox" ? toolScore(c, ex, ans) : negativeToolScore(c, ans)),
-      // recall of observed working functions mapped to -1..1 (0 = half covered); unknown -> neutral 0
-      functional_coverage: M.functional_coverage * (fc.coverage == null ? 0 : 2 * fc.coverage - 1) *
-        (fc.confirmed ? 1 : SCORING.functional.maybe_weight),
+      // Confirmed recall is primary. Any number of uncertain tools shares one small bonus.
+      functional_coverage: M.functional_coverage * (fc.confirmedCoverage == null ? 0 : 2 * fc.confirmedCoverage - 1),
+      uncertain_tools: mode === "victorinox" ? 0 : SCORING.functional.maybe_bonus * (fc.uncertainCoverage ?? 0),
       handling_similarity: M.handling * (hd.score ?? 0),
       excess: M.excess * excessScore(c, ex, ans),
       length: M.length * len.s * (0.4 + 0.6 * len.conf),

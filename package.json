@@ -7,10 +7,11 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "test": "node scripts/test-score.cjs && node scripts/test-embeddings.cjs",
+    "test": "node scripts/test-score.cjs && node scripts/test-embeddings.cjs && node scripts/test-overkill.cjs",
     "embeddings:generate": "node scripts/semantic.cjs generate",
     "embeddings:check": "node scripts/semantic.cjs check",
     "embeddings:search": "node scripts/semantic.cjs search",
+    "test:overkill": "node scripts/test-overkill.cjs",
     "test:embeddings": "node scripts/test-embeddings.cjs"
   },
   "dependencies": {

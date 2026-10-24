@@ -41,7 +41,10 @@
   "clarify": {
     "max_rounds": 2,
     "ask_below_confidence": 0.75,
-    "top_k": 5
+    "top_k": 5,
+    "overkill_function_ratio": 1.5,
+    "overkill_min_coverage": 0.6,
+    "overkill_max_missing": 2
   },
   "excluded_categories": [
     "OTHER"
@@ -75,7 +78,7 @@
       "learned": 0.75,
       "material": 0.25,
       "color": 0.2,
-      "excess": 2,
+      "excess": 3,
       "category_low_evidence": 1.5
     },
     "unknown": {
@@ -90,12 +93,12 @@
       "learned": 0.75,
       "material": 0.25,
       "color": 0.2,
-      "excess": 2,
+      "excess": 3,
       "category_low_evidence": 1.5
     }
   },
   "functional": {
-    "_comment": "Replacement: tools is explicit-negative penalty only; coverage is primary. Crossref and learned each <=0.75, both gated by min(total, confirmed) coverage^2. Unobserved tools have no absence penalty; excess is a weak complexity preference. Excess is capped at 2 versus an 11-point functional score span; low-information rings/lanyards carry less handling evidence. Maybe-only coverage is scaled by maybe_weight.",
+    "_comment": "Replacement: confirmed coverage is primary; all maybe-tools share a bounded bonus (maybe_bonus). Explicit negatives only; unseen tools are not absent. Complexity preference capped at 3 versus an 11-point confirmed functional score span; catalog function count also captures XXL complexity hidden by canonical tool deduplication. Crossref/learned remain coverage-gated.",
     "answer_weight": 1.25,
     "maybe_weight": 0.4,
     "learned_gate_power": 2,
@@ -117,6 +120,8 @@
       "thumb_stud": 1,
       "lanyard_hole": 0.25,
       "key_ring": 0.25
-    }
+    },
+    "maybe_bonus": 0.5,
+    "excess_catalog_function_factor": 0.5
   }
 }

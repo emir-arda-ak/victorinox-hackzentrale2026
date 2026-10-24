@@ -27,6 +27,7 @@ export type FunctionalCoverage = {
   /** weighted recall of the observed working functions, 0..1; null = no working function observed (unknown, not perfect) */
   coverage: number | null;
   confirmedCoverage: number | null; // recall using only seen / explicitly confirmed tools
+  uncertainCoverage: number | null; // maybe-only recall, independently bounded in ranking
   matched: ToolId[]; // confirmed working functions with full credit
   missing: ToolId[]; // CONFIRMED working functions the candidate lacks (maybe-tools are not listed)
   partial: ToolId[]; // matched only as sub-tool or other blade size (not an exact match)
@@ -59,7 +60,7 @@ function credit(c: CatalogModel, t: ToolId): number {
  *  "covers" everything). Log-scaled, so a few extra tools cost almost nothing. Hypothesis, see report. */
 export function excessScore(c: CatalogModel, ex: Extraction, ans: Answers): number {
   const observed = [...observedTools(ex, ans)].filter(([t, w]) => isWorking(t) && w >= 1).length;
-  const candWorking = c.tools.filter(isWorking).length;
+  const candWorking = Math.max(c.tools.filter(isWorking).length, c.function_count * F.excess_catalog_function_factor);
   const ratio = candWorking / Math.max(F.excess_min_tools, observed * F.excess_slack);
   return -Math.max(0, Math.min(1, Math.log2(Math.max(ratio, 1)) / F.excess_log_scale));
 }
@@ -72,6 +73,8 @@ export function functionalCoverageScore(c: CatalogModel, ex: Extraction, ans: An
   let confirmed = 0;
   let confirmedNum = 0;
   let confirmedDen = 0;
+  let uncertainNum = 0;
+  let uncertainDen = 0;
   const matched: ToolId[] = [];
   const missing: ToolId[] = [];
   const partial: ToolId[] = [];
@@ -90,10 +93,15 @@ export function functionalCoverageScore(c: CatalogModel, ex: Extraction, ans: An
       if (cr === 1) matched.push(t);
       else if (cr > 0) partial.push(t);
       else missing.push(t);
-    } else if (cr > 0) uncertainMatched.push(t);
+    } else {
+      uncertainNum += w * cr;
+      uncertainDen += w;
+      if (cr > 0) uncertainMatched.push(t);
+    }
   }
   return { coverage: den > 0 ? num / den : null,
     confirmedCoverage: confirmedDen > 0 ? confirmedNum / confirmedDen : null,
+    uncertainCoverage: uncertainDen > 0 ? uncertainNum / uncertainDen : null,
     matched, missing, partial, uncertainMatched, confirmed };
 }
 
